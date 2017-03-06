@@ -5,3 +5,4 @@ pyparsing==2.1.10
 pyserial==3.2.1
 six==1.10.0
 spidev==3.2
+flask==0.12
