@@ -18,5 +18,5 @@ class TestGamePad(BaseGamePad):
 
     def getKeys(self):
         return {
-            'A': heardEnter(),
+            '1': heardEnter(),
         }
