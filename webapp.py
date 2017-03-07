@@ -2,7 +2,7 @@
 from flask import Flask, render_template, make_response, request
 import uuid
 from Led import create_led
-from games import JumpGame
+from animations import JumpGame
 from gamepads import WebGamePad
 
 app = Flask(__name__)

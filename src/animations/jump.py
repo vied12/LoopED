@@ -1,22 +1,24 @@
 #!/usr/bin/env python
 
 from bibliopixel import colors
+
 from bibliopixel.util import d
-from bibliopixel.animation import BaseStripAnim
+from BiblioPixelAnimations.strip import LarsonScanners
+from bibliopixel.animation import BaseStripAnim, AnimationQueue
 from animations import BaseGameAnim
 import sys
 
 
-class JumpIntro(BaseStripAnim):
-    def __init__(self, led, start=0, end=-1):
-        super(JumpIntro, self).__init__(led, start, end)
-
-    def step(self, amt=1):
-        self._led.all_off()
-        self._led.fill(colors.Blue, self._step % self._led.numLEDs)
-        self._step += amt
-        if self._step == 1000:
-            self.animComplete = True
+# class JumpIntro(BaseStripAnim):
+#     def __init__(self, led, start=0, end=-1):
+#         super(JumpIntro, self).__init__(led, start, end)
+#
+#     def step(self, amt=1):
+#         self._led.all_off()
+#         self._led.fill(colors.Blue, self._step % self._led.numLEDs)
+#         self._step += amt
+#         if self._step == 1000:
+#             self.animComplete = True
 
 
 class JumpGame(BaseGameAnim):
@@ -91,15 +93,19 @@ class JumpGame(BaseGameAnim):
         self.handleKeys()
 
 
+class Jump(AnimationQueue):
+    def __init__(self, led, gamepad, players, **kwargs):
+        super(Jump, self).__init__(led, **kwargs)
+        self.addAnim(LarsonScanners.LarsonRainbow(led), fps=40, max_steps=180)
+        self.addAnim(JumpGame(led, gamepad, players), fps=40)
+
+
 if __name__ == '__main__':
     from Led import create_led
     from gamepads import TestGamePad
-    from bibliopixel.animation import AnimationQueue
     gamepad = TestGamePad()
     led = create_led(dev=len(sys.argv) > 1 and sys.argv[1] == 'test')
-    queue = AnimationQueue(led)
-    queue.addAnim(JumpIntro(led), untilComplete=True, max_steps=150)
-    queue.addAnim(JumpGame(led, gamepad, ['1', '2']), fps=40)
+    queue = Jump(led, gamepad, players=['1', '2'])
     try:
         queue.run(sleep=15)
     except KeyboardInterrupt:

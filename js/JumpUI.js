@@ -11,7 +11,7 @@ export const JumpUI = (props) => {
     }
     return (
         <div style={style} onClick={handleClick}>
-            {getCookie('token')}
+            Jump !
         </div>
     )
 }
@@ -25,5 +25,10 @@ const style = {
     backgroundColor: '#141313',
     color: 'white',
     textAlign: 'center',
+    fontSize: 54,
     paddingTop: 50,
+    userSelect: 'none',
+    MozUserSelect: 'none',
+    WebkitUserSelect: 'none',
+    msUserSelect: 'none',
 }
