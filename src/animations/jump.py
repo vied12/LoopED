@@ -2,8 +2,21 @@
 
 from bibliopixel import colors
 from bibliopixel.util import d
+from bibliopixel.animation import BaseStripAnim
 from animations import BaseGameAnim
 import sys
+
+
+class JumpIntro(BaseStripAnim):
+    def __init__(self, led, start=0, end=-1):
+        super(JumpIntro, self).__init__(led, start, end)
+
+    def step(self, amt=1):
+        self._led.all_off()
+        self._led.fill(colors.Blue, self._step % self._led.numLEDs)
+        self._step += amt
+        if self._step == 1000:
+            self.animComplete = True
 
 
 class JumpGame(BaseGameAnim):
@@ -81,11 +94,14 @@ class JumpGame(BaseGameAnim):
 if __name__ == '__main__':
     from Led import create_led
     from gamepads import TestGamePad
+    from bibliopixel.animation import AnimationQueue
     gamepad = TestGamePad()
     led = create_led(dev=len(sys.argv) > 1 and sys.argv[1] == 'test')
-    anim = JumpGame(led, gamepad, ['1', '2'])
+    queue = AnimationQueue(led)
+    queue.addAnim(JumpIntro(led), untilComplete=True, max_steps=150)
+    queue.addAnim(JumpGame(led, gamepad, ['1', '2']), fps=40)
     try:
-        anim.run(sleep=25)
+        queue.run(sleep=15)
     except KeyboardInterrupt:
         led.all_off()
         led.update()
