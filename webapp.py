@@ -2,11 +2,11 @@
 from flask import Flask, render_template, make_response, request
 import uuid
 from Led import create_led
-from animations import JumpGame
+from animations import Jump
 from gamepads import WebGamePad
-
+import os
 app = Flask(__name__)
-led = create_led(dev=False)
+led = create_led(dev=os.environ.get('DEV_MODE', False))
 gamepad = WebGamePad()
 jumpGame = None
 state = {
@@ -25,8 +25,8 @@ def connectJump():
     resp.set_cookie('token', token)
     if jumpGame:
         jumpGame.stopThread()
-    jumpGame = JumpGame(led=led, gamepad=gamepad, players=state['players'])
-    jumpGame.run(sleep=25, threaded=True)
+    jumpGame = Jump(led=led, gamepad=gamepad, players=state['players'])
+    jumpGame.run(threaded=True)
     return resp
 
 

@@ -97,7 +97,7 @@ class Jump(AnimationQueue):
     def __init__(self, led, gamepad, players, **kwargs):
         super(Jump, self).__init__(led, **kwargs)
         self.addAnim(LarsonScanners.LarsonRainbow(led), fps=40, max_steps=180)
-        self.addAnim(JumpGame(led, gamepad, players), fps=40)
+        self.addAnim(JumpGame(led, gamepad, players), fps=50)
 
 
 if __name__ == '__main__':
