@@ -6,7 +6,7 @@ from animations import JumpGame
 from gamepads import WebGamePad
 
 app = Flask(__name__)
-led = create_led(dev=True)
+led = create_led(dev=False)
 gamepad = WebGamePad()
 jumpGame = None
 state = {
