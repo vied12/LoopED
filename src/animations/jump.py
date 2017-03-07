@@ -1,7 +1,9 @@
+#!/usr/bin/env python
+
 from bibliopixel import colors
 from bibliopixel.util import d
+from animations import BaseGameAnim
 import sys
-from BaseGameAnim import BaseGameAnim
 
 
 class JumpGame(BaseGameAnim):
@@ -23,7 +25,6 @@ class JumpGame(BaseGameAnim):
                 diying=0,
             ))
             self.addKeyFunc(player, lambda i=i: self.jump(player_idx=i))
-        print(self.players)
 
     def jump(self, player_idx):
         if self.players[player_idx].jumping:
@@ -36,7 +37,6 @@ class JumpGame(BaseGameAnim):
         self.ball.position = (
             self.ball.position +
             (self.ball.direction)) % self._led.numLEDs
-            # (self.ball.direction * self.ball.speed)) % self._led.numLEDs
 
     def detectColision(self):
         for p in self.players:
@@ -79,9 +79,11 @@ class JumpGame(BaseGameAnim):
 
 
 if __name__ == '__main__':
-    from Led import get_led
-    led = get_led(dev=len(sys.argv) > 1 and sys.argv[1] == 'test')
-    anim = JumpGame(led, 3)
+    from Led import create_led
+    from gamepads import TestGamePad
+    gamepad = TestGamePad()
+    led = create_led(dev=len(sys.argv) > 1 and sys.argv[1] == 'test')
+    anim = JumpGame(led, gamepad, ['1', '2'])
     try:
         anim.run(sleep=25)
     except KeyboardInterrupt:

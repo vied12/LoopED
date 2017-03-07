@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 from flask import Flask, render_template, make_response, request
 import uuid
-from Led import get_led
+from Led import create_led
 from games import JumpGame
 from gamepads import WebGamePad
 
 app = Flask(__name__)
-led = get_led(dev=True)
+led = create_led(dev=True)
 gamepad = WebGamePad()
 jumpGame = None
 state = {
