@@ -22,7 +22,7 @@ class JumpGame(BaseGameAnim):
                 token=player,
                 diying=0,
             ))
-            self.addKeyFunc(player, lambda: self.jump(player_idx=i))
+            self.addKeyFunc(player, lambda i=i: self.jump(player_idx=i))
         print(self.players)
 
     def jump(self, player_idx):
