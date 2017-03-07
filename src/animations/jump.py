@@ -3,22 +3,10 @@
 from bibliopixel import colors
 
 from bibliopixel.util import d
-from BiblioPixelAnimations.strip import LarsonScanners
-from bibliopixel.animation import BaseStripAnim, AnimationQueue
+from BiblioPixelAnimations.strip import Rainbows
+from bibliopixel.animation import AnimationQueue
 from animations import BaseGameAnim
 import sys
-
-
-# class JumpIntro(BaseStripAnim):
-#     def __init__(self, led, start=0, end=-1):
-#         super(JumpIntro, self).__init__(led, start, end)
-#
-#     def step(self, amt=1):
-#         self._led.all_off()
-#         self._led.fill(colors.Blue, self._step % self._led.numLEDs)
-#         self._step += amt
-#         if self._step == 1000:
-#             self.animComplete = True
 
 
 class JumpGame(BaseGameAnim):
@@ -96,7 +84,7 @@ class JumpGame(BaseGameAnim):
 class Jump(AnimationQueue):
     def __init__(self, led, gamepad, players, **kwargs):
         super(Jump, self).__init__(led, **kwargs)
-        self.addAnim(LarsonScanners.LarsonRainbow(led), fps=40, max_steps=180)
+        self.addAnim(Rainbows.RainbowCycle(led), fps=50, max_steps=180)
         self.addAnim(JumpGame(led, gamepad, players), fps=50)
 
 
