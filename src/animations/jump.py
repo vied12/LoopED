@@ -7,6 +7,7 @@ from BiblioPixelAnimations.strip import Rainbows, Wave
 from bibliopixel.animation import AnimationQueue
 from animations import BaseGameAnim
 import sys
+import random
 
 
 class JumpGame(BaseGameAnim):
@@ -15,7 +16,7 @@ class JumpGame(BaseGameAnim):
         self.callback = callback
         self.ball = d(
             position=0,
-            direction=1,
+            direction=random.choice([1, -1]),
             speed=0.1,
         )
         self.action_delay = 20
