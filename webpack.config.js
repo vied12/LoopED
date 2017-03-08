@@ -20,5 +20,6 @@ module.exports = {
         ]
     },
     plugins: [
+        new webpack.DefinePlugin({ config: { HOST: JSON.stringify(process.env.HOST) } })
     ]
 };

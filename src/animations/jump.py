@@ -10,14 +10,15 @@ import sys
 
 
 class JumpGame(BaseGameAnim):
-    def __init__(self, led, gamepad, players, start=0, end=-1):
+    def __init__(self, led, gamepad, players, callback=None, start=0, end=-1):
         super(JumpGame, self).__init__(led, start, end, gamepad)
+        self.callback = callback
         self.ball = d(
             position=0,
             direction=1,
             speed=0.1,
         )
-        self.action_delay = 15
+        self.action_delay = 20
         self.players = []
         for i, player in enumerate(players):
             self.players.append(d(
@@ -27,6 +28,7 @@ class JumpGame(BaseGameAnim):
                 blocking=0,
                 token=player,
                 diying=0,
+                dead=False,
             ))
             self.addKeyFunc(player, lambda i=i: self.jump(player_idx=i))
 
@@ -56,13 +58,19 @@ class JumpGame(BaseGameAnim):
                     self.toggleDirection()
 
     def kill(self, player):
-        player.diying = self.action_delay * 2
+        player['dead'] = True
+        player['diying'] = self.action_delay * 2
 
     def toggleDirection(self):
         self.ball.direction = 0 - self.ball.direction
 
     def speedUpBall(self, val=0.1):
         self.ball.speed = min(self.ball.speed + val, 1)
+
+    def end(self):
+        if self.callback:
+            self.callback(self.players)
+        self.animComplete = True
 
     def step(self, amt=1):
         self._step += amt
@@ -82,7 +90,7 @@ class JumpGame(BaseGameAnim):
                     self._led.set(p.position, colors.Green)
                 p.diying -= 1
                 if p.diying == 0:
-                    self.animComplete = True
+                    self.end()
             elif p.jumping:
                 p.jumping -= 1
             elif p.blocking:
@@ -96,11 +104,11 @@ class JumpGame(BaseGameAnim):
 
 
 class Jump(AnimationQueue):
-    def __init__(self, led, gamepad, players, **kwargs):
+    def __init__(self, led, gamepad, players, callback=None, **kwargs):
         super(Jump, self).__init__(led, **kwargs)
         self.addAnim(Wave.WaveMove(led, colors.White, cycles=5), max_steps=50)
         self.addAnim(JumpGame(
-            led, gamepad, players),
+            led, gamepad, players, callback=callback),
             fps=50,
             untilComplete=True)
         self.addAnim(Rainbows.RainbowCycle(led), fps=15)

@@ -14,6 +14,9 @@ module.exports = {
     "plugins": [
         "react"
     ],
+    "globals": {
+        config: true
+    },
     "rules": {
         'react/jsx-uses-react': 'error',
         'react/react-in-jsx-scope': 'error',
@@ -49,7 +52,6 @@ module.exports = {
         "brace-style": "error",
         "callback-return": "error",
         "camelcase": "error",
-        "capitalized-comments": "error",
         "comma-dangle": "off",
         "comma-spacing": [
             "error",
@@ -114,7 +116,6 @@ module.exports = {
         "max-params": "error",
         "max-statements": "error",
         "max-statements-per-line": "error",
-        "multiline-ternary": "error",
         "new-cap": "error",
         "new-parens": "error",
         "newline-after-var": [
