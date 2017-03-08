@@ -1,9 +1,8 @@
 import React from 'react'
-import { getCookie } from './util'
 
-export const JumpUI = (props) => {
+export const JumpUI = () => {
 
-    const handleClick = (event) => {
+    const handleClick = () => {
         fetch('/jump', {
             credentials: 'same-origin',
             method: 'POST',

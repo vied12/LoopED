@@ -1,6 +1,7 @@
 var webpack = require('webpack');
 module.exports = {
     entry: [
+        "fastclick",
         "whatwg-fetch",
         "./js/app.js"
     ],

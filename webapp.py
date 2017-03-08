@@ -6,6 +6,7 @@ from animations import Jump
 from gamepads import WebGamePad
 import os
 app = Flask(__name__)
+app.config.from_envvar('SETTINGS')
 led = create_led(dev=os.environ.get('DEV_MODE', False))
 gamepad = WebGamePad()
 jumpGame = None
@@ -15,6 +16,11 @@ state = {
 
 
 @app.route('/')
+def gameList():
+    print('coucou')
+    return render_template('index.html')
+
+@app.route('/jump')
 def connectJump():
     global jumpGame
     token = request.cookies.get('token')
@@ -30,7 +36,7 @@ def connectJump():
     return resp
 
 
-@app.route('/jump', methods=['POST'])
+@app.route('/controller', methods=['POST'])
 def jump():
     token = request.cookies.get('token')
     gamepad.click(token)

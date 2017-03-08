@@ -5,7 +5,7 @@ from bibliopixel.led import LEDStrip
 
 def create_led(dev=False, length=96):
     if dev:
-        driver = DriverVisualizer(length, stayTop=True)
+        driver = DriverVisualizer(length, stayTop=False)
     else:
         driver = DriverWS2801(length, SPISpeed=.2, c_order=[0, 2, 1])
     led = LEDStrip(driver)
