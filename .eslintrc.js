@@ -50,7 +50,6 @@ module.exports = {
         "callback-return": "error",
         "camelcase": "error",
         "capitalized-comments": "error",
-        "class-methods-use-this": "error",
         "comma-dangle": "off",
         "comma-spacing": [
             "error",
@@ -203,7 +202,6 @@ module.exports = {
         "no-sync": "error",
         "no-tabs": "error",
         "no-template-curly-in-string": "error",
-        "no-ternary": "error",
         "no-throw-literal": "error",
         "no-trailing-spaces": "error",
         "no-undef-init": "error",
@@ -232,7 +230,6 @@ module.exports = {
             "always"
         ],
         "object-property-newline": "error",
-        "object-shorthand": "error",
         "one-var": "off",
         "one-var-declaration-per-line": "error",
         "operator-assignment": "error",

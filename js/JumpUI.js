@@ -1,14 +1,18 @@
 import React from 'react'
+import { WaterSurface } from './WaterSurface'
 
-export const JumpUI = () => {
+export class JumpUI extends React.Component {
 
-    fetch('/jump', {
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' },
-        method: 'POST',
-    })
+    constructor(props) {
+        super(props)
+        fetch('/jump', {
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            method: 'POST',
+        })
+    }
 
-    const handleClick = () => {
+    handleClick() {
         fetch('/controller', {
             credentials: 'same-origin',
             headers: { 'Content-Type': 'application/json' },
@@ -16,11 +20,14 @@ export const JumpUI = () => {
             body: JSON.stringify({ game: 'jump' })
         })
     }
-    return (
-        <div style={style} onClick={handleClick}>
-            Jump !
-        </div>
-    )
+
+    render() {
+        return (
+            <div style={style} onClick={this.handleClick.bind(this)}>
+                <WaterSurface />
+            </div>
+        )
+    }
 }
 
 const style = {
@@ -33,7 +40,6 @@ const style = {
     color: 'white',
     textAlign: 'center',
     fontSize: 54,
-    paddingTop: 50,
     userSelect: 'none',
     MozUserSelect: 'none',
     WebkitUserSelect: 'none',
