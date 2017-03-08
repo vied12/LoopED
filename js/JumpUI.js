@@ -2,10 +2,18 @@ import React from 'react'
 
 export const JumpUI = () => {
 
+    fetch('/jump', {
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+    })
+
     const handleClick = () => {
-        fetch('/jump', {
+        fetch('/controller', {
             credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
             method: 'POST',
+            body: JSON.stringify({ game: 'jump' })
         })
     }
     return (

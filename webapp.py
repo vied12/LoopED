@@ -9,35 +9,36 @@ app = Flask(__name__)
 app.config.from_envvar('SETTINGS')
 led = create_led(dev=os.environ.get('DEV_MODE', False))
 gamepad = WebGamePad()
-jumpGame = None
+
 state = {
+    'jumpGame': None,
     'players': []
 }
 
 
 @app.route('/')
 def gameList():
-    print('coucou')
     return render_template('index.html')
 
-@app.route('/jump')
+
+@app.route('/jump', methods=['POST'])
 def connectJump():
-    global jumpGame
+    global state
     token = request.cookies.get('token')
     if not token or token not in state['players']:
         token = str(uuid.uuid4())
         state['players'].append(token)
-    resp = make_response(render_template('index.html', token=token))
+    resp = make_response()
     resp.set_cookie('token', token)
-    if jumpGame:
-        jumpGame.stopThread()
-    jumpGame = Jump(led=led, gamepad=gamepad, players=state['players'])
-    jumpGame.run(threaded=True)
+    if state['jumpGame']:
+        state['jumpGame'].stopThread()
+    state['jumpGame'] = Jump(led, gamepad=gamepad, players=state['players'])
+    state['jumpGame'].run(threaded=True)
     return resp
 
 
 @app.route('/controller', methods=['POST'])
-def jump():
+def controller():
     token = request.cookies.get('token')
     gamepad.click(token)
     return 'ok'
