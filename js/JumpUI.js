@@ -6,23 +6,38 @@ export class JumpUI extends React.Component {
 
     constructor(props) {
         super(props)
-        this.state = { status: 'waiting' }
+        this.state = {
+            status: null,
+            gameover: false,
+        }
     }
 
     componentDidMount() {
         // start the game
         this.restart()
-        this.wsEnd = new WebSocket(`ws://${config.HOST}/jump`)
-        this.wsEnd.onmessage = (event) => {
+        const wsEnd = new WebSocket(`ws://${config.HOST}/jump`)
+        wsEnd.onmessage = (event) => {
             if (event.data === 'start') {
-                this.setState({ status: 'playing' })
+                // FIXME: DRY
+                this.setState({
+                    status: null,
+                    gameover: false,
+                })
             } else {
+                const data = JSON.parse(event.data)
                 const token = getCookie('token')
-                const players = JSON.parse(event.data)
-                const looser = players.find((p) => p.dead)
-                const isItMe = looser.token === token
-                const status = isItMe ? 'loose' : 'win'
-                this.setState({ status: status })
+                const players = data.payload
+                if (data.type === 'end') {
+                    const status = players.find((d) => (d.dead && d.token == token)) ? 'loose' : 'win'
+                    this.setState({
+                        status: status,
+                        gameover: true,
+                    })
+                } else if (data.type === 'die') {
+                    if (players.find((d) => (d.dead && d.token == token))) {
+                        this.setState({ status: 'loose' })
+                    }
+                }
             }
         }
     }
@@ -37,7 +52,10 @@ export class JumpUI extends React.Component {
     }
 
     restart() {
-        this.setState({ status: 'playing' }, () => (
+        this.setState({
+            status: null,
+            gameover: false,
+        }, () => (
             fetch('/jump', {
                 credentials: 'same-origin',
                 headers: { 'Content-Type': 'application/json' },
@@ -47,10 +65,11 @@ export class JumpUI extends React.Component {
     }
 
     render() {
-        const { status } = this.state
+        const { status, gameover } = this.state
+        console.log({ status, gameover })
         return (
             <div style={style} onClick={this.handleClick.bind(this)}>
-                {status === 'playing' &&
+                {!gameover &&
                     <WaterSurface />
                 }
                 {status === 'loose' &&
@@ -59,7 +78,7 @@ export class JumpUI extends React.Component {
                 {status === 'win' &&
                     <div style={styleResult}><i className="material-icons pmd-lg">sentiment_very_satisfied</i></div>
                 }
-                {['win', 'loose'].indexOf(status) > -1 &&
+                {gameover &&
                     <button onClick={this.restart.bind(this)}
                     className="btn btn-lg pmd-btn-fab pmd-btn-raised pmd-ripple-effect btn-primary" type="button">
                         <i className="material-icons pmd-sm">replay</i>

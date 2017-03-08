@@ -30,14 +30,6 @@ def echo_socket(ws):
         ws.receive()
 
 
-@sockets.route('/start')
-def restart_socket(ws):
-    state['ws'].append(ws)
-    while not ws.closed:
-        gevent.sleep(3)
-        ws.receive()
-
-
 @app.route('/')
 def gameList():
     return render_template('index.html')
@@ -46,6 +38,8 @@ def gameList():
 def send_notifs(msg):
     for ws in state['ws']:
         try:
+            if type(msg) is dict:
+                msg = json.dumps(msg)
             ws.send(msg)
         except geventwebsocket.WebSocketError:
             state['ws'].remove(ws)
@@ -66,7 +60,8 @@ def connectJump():
         led,
         gamepad=gamepad,
         players=state['players'],
-        callback=lambda anim: send_notifs(json.dumps(anim)))
+        onDie=lambda d: send_notifs({'type': 'die', 'payload': d}),
+        onEnd=lambda d: send_notifs({'type': 'end', 'payload': d}))
     state['jumpGame'].run(threaded=True, untilComplete=True)
     send_notifs('start')
     return resp

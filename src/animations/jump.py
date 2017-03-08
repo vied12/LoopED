@@ -11,9 +11,10 @@ import random
 
 
 class JumpGame(BaseGameAnim):
-    def __init__(self, led, gamepad, players, callback=None, start=0, end=-1):
+    def __init__(self, led, gamepad, players, onDie=None, onEnd=None, start=0, end=-1):
         super(JumpGame, self).__init__(led, start, end, gamepad)
-        self.callback = callback
+        self.onDie = onDie
+        self.onEnd = onEnd
         self.ball = d(
             position=0,
             direction=random.choice([1, -1]),
@@ -61,6 +62,8 @@ class JumpGame(BaseGameAnim):
     def kill(self, player):
         player['dead'] = True
         player['diying'] = self.action_delay * 2
+        if self.onDie:
+            self.onDie(self.players)
 
     def toggleDirection(self):
         self.ball.direction = 0 - self.ball.direction
@@ -69,12 +72,18 @@ class JumpGame(BaseGameAnim):
         self.ball.speed = min(self.ball.speed + val, 1)
 
     def end(self):
-        if self.callback:
-            self.callback(self.players)
+        if self.onEnd:
+            self.onEnd(self.players)
         self.animComplete = True
+
+    def is_time_to_end(self):
+        min_player_alive = min(len(self.players), 2)
+        return len([_ for _ in self.players if _['diying'] > 0 or not _['dead']]) < min_player_alive
 
     def step(self, amt=1):
         self._step += amt
+        if self.is_time_to_end():
+            return self.end()
         self.moveBall()
         if not self._step % 20:
             self.speedUpBall()
@@ -89,9 +98,7 @@ class JumpGame(BaseGameAnim):
                     self._led.set(p.position, colors.Orange)
                 else:
                     self._led.set(p.position, colors.Green)
-                p.diying -= 1
-                if p.diying == 0:
-                    self.end()
+                p['diying'] -= 1
             elif p.jumping:
                 p.jumping -= 1
             elif p.blocking:
@@ -105,13 +112,16 @@ class JumpGame(BaseGameAnim):
 
 
 class Jump(AnimationQueue):
-    def __init__(self, led, gamepad, players, callback=None, **kwargs):
-        super(Jump, self).__init__(led, **kwargs)
+    def __init__(self, led, gamepad, players, onDie=None, onEnd=None):
+        super(Jump, self).__init__(led)
+        # intro
         self.addAnim(Wave.WaveMove(led, colors.White, cycles=5), max_steps=50)
+        # game
         self.addAnim(JumpGame(
-            led, gamepad, players, callback=callback),
+            led, gamepad, players, onDie=onDie, onEnd=onEnd),
             fps=50,
             untilComplete=True)
+        # outro
         self.addAnim(Rainbows.RainbowCycle(led), fps=15)
 
 
@@ -120,7 +130,7 @@ if __name__ == '__main__':
     from gamepads import TestGamePad
     gamepad = TestGamePad()
     led = create_led(dev=len(sys.argv) > 1 and sys.argv[1] == 'test')
-    game = Jump(led, gamepad, players=['1', '2'])
+    game = Jump(led, gamepad, players=['1', '2', '3'])
     try:
         game.run(sleep=15, untilComplete=True)
     except KeyboardInterrupt:
