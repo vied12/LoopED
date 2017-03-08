@@ -33,7 +33,7 @@ def connectJump():
     if state['jumpGame']:
         state['jumpGame'].stopThread()
     state['jumpGame'] = Jump(led, gamepad=gamepad, players=state['players'])
-    state['jumpGame'].run(threaded=True)
+    state['jumpGame'].run(threaded=True, max_cycles=1)
     return resp
 
 
