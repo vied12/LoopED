@@ -52,7 +52,7 @@ class JumpGame(BaseGameAnim):
 
     def detectColision(self):
         for p in self.players:
-            if p.position == self.ball.position:
+            if not p['dead'] and p.position == self.ball.position:
                 if not p.blocking and not p.jumping:
                     self.kill(p)
                 elif p.blocking:
@@ -62,6 +62,7 @@ class JumpGame(BaseGameAnim):
     def kill(self, player):
         player['dead'] = True
         player['diying'] = self.action_delay * 2
+        self.speedUpBall(-.5)
         if self.onDie:
             self.onDie(self.players)
 
@@ -69,7 +70,7 @@ class JumpGame(BaseGameAnim):
         self.ball.direction = 0 - self.ball.direction
 
     def speedUpBall(self, val=0.1):
-        self.ball.speed = min(self.ball.speed + val, 1)
+        self.ball.speed = min(max(self.ball.speed + val, 0.1), 1)
 
     def end(self):
         if self.onEnd:
@@ -78,7 +79,9 @@ class JumpGame(BaseGameAnim):
 
     def is_time_to_end(self):
         min_player_alive = min(len(self.players), 2)
-        return len([_ for _ in self.players if _['diying'] > 0 or not _['dead']]) < min_player_alive
+        return len([
+            _ for _ in self.players if _['diying'] > 0 or not _['dead']
+        ]) < min_player_alive
 
     def step(self, amt=1):
         self._step += amt
@@ -104,7 +107,7 @@ class JumpGame(BaseGameAnim):
             elif p.blocking:
                 self._led.set(p.position, colors.Red)
                 p.blocking -= 1
-            else:
+            elif not p['dead']:
                 self._led.set(p.position, colors.Blue)
         self.handleKeys()
         if self._step == 255:
