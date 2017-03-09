@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom'
 import { GameList } from './GameList'
 import { JumpUI } from './JumpUI'
 import { Router, Route, IndexRoute, Link, hashHistory } from 'react-router'
+import FastClick from 'fastclick'
+
+FastClick.attach(document.body)
 
 function App({ children }) {
     return (children)
