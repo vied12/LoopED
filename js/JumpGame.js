@@ -1,42 +1,48 @@
 import React from 'react'
 import { WaterSurface } from './WaterSurface'
-import { getCookie } from './util'
+import { getCookie, startLEDGame } from './util'
 
-export class JumpUI extends React.Component {
+JumpGame.propTypes = { color: React.PropTypes.object }
+export class JumpGame extends React.Component {
 
     constructor(props) {
         super(props)
         this.state = {
             status: null,
+            player: null,
             gameover: false,
         }
     }
 
-    componentDidMount() {
+    componentWillUnmount() {
+        this.ws.close()
+    }
+
+    componentWillMount() {
         // start the game
-        this.restart()
-        const wsEnd = new WebSocket(`ws://${config.HOST}/jump`)
-        wsEnd.onmessage = (event) => {
-            if (event.data === 'start') {
-                // FIXME: DRY
+        this.wsEnd = new WebSocket(`ws://${config.HOST}/jump`)
+        this.wsEnd.onerror = (event) => {
+            console.err('ws err', event)
+        }
+        this.wsEnd.onmessage = (event) => {
+            const data = JSON.parse(event.data)
+            console.log('ws', data)
+            const token = getCookie('token')
+            const players = data.payload
+            if (data.type === 'start') {
                 this.setState({
                     status: null,
                     gameover: false,
                 })
-            } else {
-                const data = JSON.parse(event.data)
-                const token = getCookie('token')
-                const players = data.payload
-                if (data.type === 'end') {
-                    const status = players.find((d) => (d.dead && d.token == token)) ? 'loose' : 'win'
-                    this.setState({
-                        status: status,
-                        gameover: true,
-                    })
-                } else if (data.type === 'die') {
-                    if (players.find((d) => (d.dead && d.token == token))) {
-                        this.setState({ status: 'loose' })
-                    }
+            } else if (data.type === 'end') {
+                const status = players.find((d) => (d.dead && d.token == token)) ? 'loose' : 'win'
+                this.setState({
+                    status: status,
+                    gameover: true,
+                })
+            } else if (data.type === 'die') {
+                if (players.find((d) => (d.dead && d.token === token))) {
+                    this.setState({ status: 'loose' })
                 }
             }
         }
@@ -52,23 +58,23 @@ export class JumpUI extends React.Component {
     }
 
     restart() {
-        this.setState({
-            status: null,
-            gameover: false,
-        }, () => (
-            fetch('/jump', {
-                credentials: 'same-origin',
-                headers: { 'Content-Type': 'application/json' },
-                method: 'POST',
+        startLEDGame().then(() => {
+            this.setState({
+                status: null,
+                gameover: false,
             })
-        ))
+        })
     }
 
     render() {
         const { status, gameover } = this.state
-        console.log({ status, gameover })
+        const { color } = this.props
+        const s = {
+            ...style,
+            backgroundColor: `rgb(${color[0]}, ${color[1]}, ${color[2]})`,
+        }
         return (
-            <div style={style} onClick={this.handleClick.bind(this)}>
+            <div style={s} onMouseDown={this.handleClick.bind(this)}>
                 {!gameover &&
                     <WaterSurface />
                 }
@@ -80,6 +86,7 @@ export class JumpUI extends React.Component {
                 }
                 {gameover &&
                     <button onClick={this.restart.bind(this)}
+                    onMouseDown={(e) => {e.preventDefault(); e.stopPropagation()}}
                     className="btn btn-lg pmd-btn-fab pmd-btn-raised pmd-ripple-effect btn-primary" type="button">
                         <i className="material-icons pmd-sm">replay</i>
                     </button>

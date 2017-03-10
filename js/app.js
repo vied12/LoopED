@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { GameList } from './GameList'
-import { JumpUI } from './JumpUI'
+import { Jump } from './Jump'
 import { Router, Route, IndexRoute, Link, hashHistory } from 'react-router'
 import FastClick from 'fastclick'
 
@@ -35,7 +35,7 @@ ReactDOM.render((
     <Router history={hashHistory}>
         <Route path="/" component={App}>
             <IndexRoute component={GameList} />
-            <Route path="jump" component={Game.bind(null, JumpUI)} />
+            <Route path="jump" component={Game.bind(null, Jump)} />
         </Route>
     </Router>
 ), document.getElementById('reactEntry'))

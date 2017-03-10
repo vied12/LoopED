@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from flask import Flask, render_template, make_response, request
+from flask import Flask, render_template, request, jsonify, abort
 import json
 import uuid
 from Led import create_led
@@ -9,6 +9,18 @@ from flask_sockets import Sockets
 import os
 import geventwebsocket
 import gevent
+from bibliopixel import colors
+
+COLORS = [
+    colors.Orange,
+    colors.Indigo,
+    colors.Green,
+    colors.Violet,
+    colors.Olive,
+    colors.Blue,
+    colors.Yellow,
+]
+
 
 app = Flask(__name__)
 app.config.from_envvar('SETTINGS')
@@ -16,16 +28,17 @@ led = create_led(dev=os.environ.get('DEV_MODE', False))
 gamepad = WebGamePad()
 sockets = Sockets(app)
 
-state = {
+app.state = {
     'jumpGame': None,
     'players': [],
     'ws': [],
+    'playing': False,
 }
 
 
 @sockets.route('/jump')
 def echo_socket(ws):
-    state['ws'].append(ws)
+    app.state['ws'].append(ws)
     while not ws.closed:
         ws.receive()
 
@@ -36,35 +49,65 @@ def gameList():
 
 
 def send_notifs(msg):
-    for ws in state['ws']:
+    if type(msg) is dict:
+        msg = json.dumps(msg)
+    for ws in app.state['ws']:
+        if ws.closed:
+            app.state['ws'].remove(ws)
+            continue
         try:
-            if type(msg) is dict:
-                msg = json.dumps(msg)
             ws.send(msg)
         except geventwebsocket.WebSocketError:
-            state['ws'].remove(ws)
+            app.state['ws'].remove(ws)
 
 
-@app.route('/jump', methods=['POST'])
+@app.route('/jump-connect', methods=['POST'])
 def connectJump():
-    global state
-    token = request.cookies.get('token')
-    if not token or token not in state['players']:
-        token = str(uuid.uuid4())
-        state['players'].append(token)
-    resp = make_response()
-    resp.set_cookie('token', token)
-    if state['jumpGame']:
-        state['jumpGame'].stopThread(wait=True)
-    state['jumpGame'] = Jump(
+    token = request.cookies.get('token', str(uuid.uuid4()))
+    player = next((_ for _ in app.state['players'] if _['token'] == token), None)
+    if not player:
+        player = {
+            'token': token,
+            'color': COLORS[len(app.state['players']) % len(COLORS)]
+        }
+        app.state['players'].append(player)
+    data = {
+        'players': app.state['players']
+    }
+    send_notifs({'type': 'join', 'payload': data})
+    response = app.response_class(
+        response=json.dumps(data),
+        status=200,
+        mimetype='application/json'
+    )
+    response.set_cookie('token', player['token'])
+    return response
+
+
+@app.route('/jump-start', methods=['POST'])
+def startJump():
+    if app.state['playing']:
+        return abort(400)
+    if app.state['jumpGame']:
+        app.state['jumpGame'].stopThread(wait=True)
+    app.state['playing'] = True
+    app.state['jumpGame'] = Jump(
         led,
         gamepad=gamepad,
-        players=state['players'],
+        players=app.state['players'],
         onDie=lambda d: send_notifs({'type': 'die', 'payload': d}),
-        onEnd=lambda d: send_notifs({'type': 'end', 'payload': d}))
-    state['jumpGame'].run(threaded=True, untilComplete=True)
-    send_notifs('start')
-    return resp
+        onEnd=onEnd)
+    app.state['jumpGame'].run(threaded=True, untilComplete=True)
+    response = {
+        'players': app.state['players']
+    }
+    send_notifs({'type': 'start', 'payload': response})
+    return jsonify(response)
+
+
+def onEnd(d):
+    app.state['playing'] = False
+    send_notifs({'type': 'end', 'payload': d})
 
 
 @app.route('/controller', methods=['POST'])
@@ -75,7 +118,6 @@ def controller():
 
 
 if __name__ == '__main__':
-    from gevent import pywsgi
     from geventwebsocket.handler import WebSocketHandler
-    server = pywsgi.WSGIServer(('', 5000), app, handler_class=WebSocketHandler)
+    server = gevent.pywsgi.WSGIServer(('0.0.0.0', 8000), app, handler_class=WebSocketHandler)
     server.serve_forever()

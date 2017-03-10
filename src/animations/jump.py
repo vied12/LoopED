@@ -1,13 +1,25 @@
 #!/usr/bin/env python
 
 from bibliopixel import colors
-
 from bibliopixel.util import d
 from BiblioPixelAnimations.strip import Rainbows, Wave
 from bibliopixel.animation import AnimationQueue
 from animations import BaseGameAnim
 import sys
 import random
+
+
+def complement(r, g, b):
+    def hilo(a, b, c):
+        if c < b:
+            b, c = c, b
+        if b < a:
+            a, b = b, a
+        if c < b:
+            b, c = c, b
+        return a + c
+    k = hilo(r, g, b)
+    return tuple(k - u for u in (r, g, b))
 
 
 class JumpGame(BaseGameAnim):
@@ -27,12 +39,17 @@ class JumpGame(BaseGameAnim):
                 position=(self._led.numLEDs / len(players)) * i
                 + (self._led.numLEDs / len(players)) / 2,
                 jumping=0,
+                color1=player['color'],
+                color2=complement(*player['color']),
                 blocking=0,
-                token=player,
+                token=player['token'],
                 diying=0,
                 dead=False,
             ))
-            self.addKeyFunc(player, lambda i=i: self.jump(player_idx=i))
+            self.addKeyFunc(
+                player['token'],
+                lambda i=i: self.jump(player_idx=i)
+            )
 
     def jump(self, player_idx):
         if self.players[player_idx].jumping:
@@ -62,7 +79,7 @@ class JumpGame(BaseGameAnim):
     def kill(self, player):
         player['dead'] = True
         player['diying'] = self.action_delay * 2
-        self.speedUpBall(-.5)
+        self.speedUpBall(-.4)
         if self.onDie:
             self.onDie(self.players)
 
@@ -98,9 +115,9 @@ class JumpGame(BaseGameAnim):
         for p in self.players:
             if p.diying:
                 if not p.diying % 3:
-                    self._led.set(p.position, colors.Orange)
+                    self._led.set(p.position, colors.White)
                 else:
-                    self._led.set(p.position, colors.Green)
+                    self._led.set(p.position, p.color2)
                 p['diying'] -= 1
             elif p.jumping:
                 p.jumping -= 1
@@ -108,7 +125,7 @@ class JumpGame(BaseGameAnim):
                 self._led.set(p.position, colors.Red)
                 p.blocking -= 1
             elif not p['dead']:
-                self._led.set(p.position, colors.Blue)
+                self._led.set(p.position, p.color1)
         self.handleKeys()
         if self._step == 255:
             self._step = 0
@@ -122,7 +139,7 @@ class Jump(AnimationQueue):
         # game
         self.addAnim(JumpGame(
             led, gamepad, players, onDie=onDie, onEnd=onEnd),
-            fps=50,
+            fps=45,
             untilComplete=True)
         # outro
         self.addAnim(Rainbows.RainbowCycle(led), fps=15)
@@ -133,7 +150,7 @@ if __name__ == '__main__':
     from gamepads import TestGamePad
     gamepad = TestGamePad()
     led = create_led(dev=len(sys.argv) > 1 and sys.argv[1] == 'test')
-    game = Jump(led, gamepad, players=['1', '2', '3'])
+    game = Jump(led, gamepad, players=['1', '2', '3', '4', '5'])
     try:
         game.run(sleep=15, untilComplete=True)
     except KeyboardInterrupt:

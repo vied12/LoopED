@@ -13,3 +13,16 @@ export function getCookie(cname) {
     }
     return "";
 }
+
+export const startLEDGame = () => (
+    fetch('/jump-start', {
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+    }).then((response) => {
+        if (response.status >= 200 && response.status < 300) {
+            return response
+        }
+        throw new Error(response.statusText)
+    })
+)
