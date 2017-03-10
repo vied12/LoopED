@@ -56,7 +56,9 @@ export class JumpGame extends React.Component {
         })
     }
 
-    restart() {
+    restart(e) {
+        e.preventDefault()
+        e.stopPropagation()
         startLEDGame().then(() => {
             this.setState({
                 status: null,
@@ -73,7 +75,7 @@ export class JumpGame extends React.Component {
             backgroundColor: `rgb(${color[0]}, ${color[1]}, ${color[2]})`,
         }
         return (
-            <div style={s} onMouseDown={this.handleClick.bind(this)}>
+            <div style={s} onClick={this.handleClick.bind(this)}>
                 {!gameover &&
                     <div>
                     <WaterSurface />
