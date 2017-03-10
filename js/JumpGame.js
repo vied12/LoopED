@@ -28,6 +28,7 @@ export class JumpGame extends React.Component {
             const data = JSON.parse(event.data)
             console.log('ws', data)
             const token = getCookie('token')
+            navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate
             const players = data.payload
             if (data.type === 'start') {
                 this.setState({
@@ -36,12 +37,16 @@ export class JumpGame extends React.Component {
                 })
             } else if (data.type === 'end') {
                 const status = players.find((d) => (d.dead && d.token == token)) ? 'loose' : 'win'
+                if (status === 'win') {
+                    navigator.vibrate([100, 100, 100, 100, 100])
+                }
                 this.setState({
                     status: status,
                     gameover: true,
                 })
             } else if (data.type === 'die') {
                 if (players.find((d) => (d.dead && d.token === token))) {
+                    navigator.vibrate(1000)
                     this.setState({ status: 'loose' })
                 }
             }
@@ -49,6 +54,7 @@ export class JumpGame extends React.Component {
     }
 
     handleClick() {
+
         fetch('/controller', {
             credentials: 'same-origin',
             headers: { 'Content-Type': 'application/json' },
@@ -68,6 +74,7 @@ export class JumpGame extends React.Component {
         })
     }
 
+
     render() {
         const { status, gameover } = this.state
         const { color } = this.props
@@ -76,7 +83,9 @@ export class JumpGame extends React.Component {
             backgroundColor: `rgb(${color[0]}, ${color[1]}, ${color[2]})`,
         }
         return (
-            <div style={s} onTouchStart={this.handleClick.bind(this)}>
+            <div
+                style={s}
+                onClick={this.handleClick}>
                 {!gameover && isNil(status) &&
                     <div>
                     <WaterSurface />
@@ -92,10 +101,6 @@ export class JumpGame extends React.Component {
                 {gameover &&
                     <button
                         onClick={this.restart.bind(this)}
-                        onTouchStart={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                        }}
                         className="btn btn-lg pmd-btn-fab pmd-btn-raised pmd-ripple-effect btn-primary" type="button">
                         <i className="material-icons pmd-sm">replay</i>
                     </button>
