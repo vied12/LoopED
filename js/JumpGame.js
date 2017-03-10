@@ -2,7 +2,6 @@ import React from 'react'
 import { WaterSurface } from './WaterSurface'
 import { getCookie, startLEDGame } from './util'
 
-JumpGame.propTypes = { color: React.PropTypes.object }
 export class JumpGame extends React.Component {
 
     constructor(props) {
@@ -76,7 +75,10 @@ export class JumpGame extends React.Component {
         return (
             <div style={s} onMouseDown={this.handleClick.bind(this)}>
                 {!gameover &&
+                    <div>
                     <WaterSurface />
+                    <h1 className="pmd-display3" style={styleResult}>JUMP!</h1>
+                    </div>
                 }
                 {status === 'loose' &&
                     <div style={styleResult}><i className="material-icons pmd-lg">sentiment_dissatisfied</i></div>
@@ -114,3 +116,4 @@ const style = {
     WebkitUserSelect: 'none',
     msUserSelect: 'none',
 }
+JumpGame.propTypes = { color: React.PropTypes.array }
