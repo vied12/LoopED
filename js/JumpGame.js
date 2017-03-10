@@ -1,5 +1,6 @@
 import React from 'react'
 import { WaterSurface } from './WaterSurface'
+import { isNil } from 'lodash'
 import { getCookie, startLEDGame } from './util'
 
 export class JumpGame extends React.Component {
@@ -75,8 +76,8 @@ export class JumpGame extends React.Component {
             backgroundColor: `rgb(${color[0]}, ${color[1]}, ${color[2]})`,
         }
         return (
-            <div style={s} onClick={this.handleClick.bind(this)}>
-                {!gameover &&
+            <div style={s} onTouchStart={this.handleClick.bind(this)}>
+                {!gameover && isNil(status) &&
                     <div>
                     <WaterSurface />
                     <h1 className="pmd-display3" style={styleResult}>JUMP!</h1>
@@ -89,9 +90,13 @@ export class JumpGame extends React.Component {
                     <div style={styleResult}><i className="material-icons pmd-lg">sentiment_very_satisfied</i></div>
                 }
                 {gameover &&
-                    <button onClick={this.restart.bind(this)}
-                    onMouseDown={(e) => {e.preventDefault(); e.stopPropagation()}}
-                    className="btn btn-lg pmd-btn-fab pmd-btn-raised pmd-ripple-effect btn-primary" type="button">
+                    <button
+                        onClick={this.restart.bind(this)}
+                        onTouchStart={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                        }}
+                        className="btn btn-lg pmd-btn-fab pmd-btn-raised pmd-ripple-effect btn-primary" type="button">
                         <i className="material-icons pmd-sm">replay</i>
                     </button>
                 }
