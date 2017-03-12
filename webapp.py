@@ -10,6 +10,7 @@ import os
 import geventwebsocket
 import gevent
 from bibliopixel import colors
+from geventwebsocket.handler import WebSocketHandler
 
 COLORS = [
     colors.Orange,
@@ -118,6 +119,5 @@ def controller():
 
 
 if __name__ == '__main__':
-    from geventwebsocket.handler import WebSocketHandler
     server = gevent.pywsgi.WSGIServer(('0.0.0.0', 8000), app, handler_class=WebSocketHandler)
     server.serve_forever()

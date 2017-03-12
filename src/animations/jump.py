@@ -22,12 +22,24 @@ def complement(r, g, b):
     return tuple(k - u for u in (r, g, b))
 
 
+def easeInQuad(n):
+    """A quadratic tween function that begins slow and then accelerates.
+    Args:
+      n (float): The time progress, starting at 0.0 and ending at 1.0.
+    Returns:
+      (float) The line progress, starting at 0.0 and ending at 1.0. Suitable for passing to getPointOnLine().
+    """
+    if not 0.0 <= n <= 1.0:
+        raise ValueError('Argument must be between 0.0 and 1.0.')
+    return n**2
+
+
 class JumpGame(BaseGameAnim):
     def __init__(self, led, gamepad, players, onDie=None, onEnd=None, start=0, end=-1):
         super(JumpGame, self).__init__(led, start, end, gamepad)
         self.onDie = onDie
         self.onEnd = onEnd
-        self.ball = d(
+        self.ball = dict(
             position=0,
             direction=random.choice([1, -1]),
             speed=0.1,
@@ -39,8 +51,8 @@ class JumpGame(BaseGameAnim):
                 position=(self._led.numLEDs / len(players)) * i
                 + (self._led.numLEDs / len(players)) / 2,
                 jumping=0,
-                color1=player['color'],
-                color2=complement(*player['color']),
+                color1=player.get('color', (255, 0, 0)),
+                color2=complement(*player.get('color', (255, 0, 0))),
                 blocking=0,
                 token=player['token'],
                 diying=0,
@@ -59,17 +71,17 @@ class JumpGame(BaseGameAnim):
             self.players[player_idx].jumping = self.action_delay
 
     def moveBall(self):
-        speed = int(round(1/self.ball.speed))
+        speed = int(round(1/self.ball['speed']))
         # do not move depending of speed
         if self._step % speed:
             return
-        self.ball.position = (
-            self.ball.position +
-            (self.ball.direction)) % self._led.numLEDs
+        self.ball['position'] = (
+            self.ball['position'] +
+            (self.ball['direction'])) % self._led.numLEDs
 
     def detectColision(self):
         for p in self.players:
-            if not p['dead'] and p.position == self.ball.position:
+            if not p['dead'] and p.position == self.ball['position']:
                 if not p.blocking and not p.jumping:
                     self.kill(p)
                 elif p.blocking:
@@ -84,10 +96,10 @@ class JumpGame(BaseGameAnim):
             self.onDie(self.players)
 
     def toggleDirection(self):
-        self.ball.direction = 0 - self.ball.direction
+        self.ball['direction'] = 0 - self.ball['direction']
 
     def speedUpBall(self, val=0.1):
-        self.ball.speed = min(max(self.ball.speed + val, 0.1), 1)
+        self.ball['speed'] = min(max(self.ball['speed'] + val, 0.1), 1)
 
     def end(self):
         if self.onEnd:
@@ -110,7 +122,7 @@ class JumpGame(BaseGameAnim):
         self.detectColision()
         self._led.all_off()
         # ball
-        self._led.set(self.ball.position, colors.White)
+        self._led.set(self.ball['position'], colors.White)
         # players
         for p in self.players:
             if p.diying:
@@ -150,7 +162,7 @@ if __name__ == '__main__':
     from gamepads import TestGamePad
     gamepad = TestGamePad()
     led = create_led(dev=len(sys.argv) > 1 and sys.argv[1] == 'test')
-    game = Jump(led, gamepad, players=['1', '2', '3', '4', '5'])
+    game = Jump(led, gamepad, players=[{'token': _} for _ in range(4)])
     try:
         game.run(sleep=15, untilComplete=True)
     except KeyboardInterrupt:
