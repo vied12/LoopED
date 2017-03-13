@@ -1,5 +1,6 @@
 import React from 'react'
 import { WaterSurface } from './WaterSurface'
+import { JumpScores } from './JumpScores'
 import { isNil } from 'lodash'
 import { getCookie, startLEDGame } from './util'
 
@@ -11,6 +12,7 @@ export class JumpGame extends React.Component {
             status: null,
             player: null,
             gameover: false,
+            lastGames: null,
         }
     }
 
@@ -26,29 +28,46 @@ export class JumpGame extends React.Component {
         }
         this.wsEnd.onmessage = (event) => {
             const data = JSON.parse(event.data)
-            console.log('ws', data)
             const token = getCookie('token')
             navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate
-            const players = data.payload
-            if (data.type === 'start') {
-                this.setState({
-                    status: null,
-                    gameover: false,
-                })
-            } else if (data.type === 'end') {
-                const status = players.find((d) => (d.dead && d.token == token)) ? 'loose' : 'win'
-                if (status === 'win') {
-                    navigator.vibrate([100, 100, 100, 100, 100])
+            const action = [
+                {
+                    type: 'start',
+                    do: () => {
+                        this.setState({
+                            status: null,
+                            gameover: false,
+                        })
+                    }
+                },
+                {
+                    type: 'end',
+                    do: () => {
+                        const lastGamePlayers = data.payload[data.payload.length - 1]
+                        const status = lastGamePlayers.find((d) => (d.dead && d.token == token)) ? 'loose' : 'win'
+                        if (status === 'win') {
+                            navigator.vibrate([100, 100, 100, 100, 100])
+                        }
+                        this.setState({
+                            status: status,
+                            gameover: true,
+                            lastGames: data.payload,
+                        })
+                    }
+                },
+                {
+                    type: 'die',
+                    do: () => {
+                        const players = data.payload
+                        if (players.find((d) => (d.dead && d.token === token))) {
+                            navigator.vibrate(1000)
+                            this.setState({ status: 'loose' })
+                        }
+                    }
                 }
-                this.setState({
-                    status: status,
-                    gameover: true,
-                })
-            } else if (data.type === 'die') {
-                if (players.find((d) => (d.dead && d.token === token))) {
-                    navigator.vibrate(1000)
-                    this.setState({ status: 'loose' })
-                }
+            ].find((d) => (d.type === data.type))
+            if (action) {
+                action.do()
             }
         }
     }
@@ -76,7 +95,7 @@ export class JumpGame extends React.Component {
 
 
     render() {
-        const { status, gameover } = this.state
+        const { status, gameover, lastGames } = this.state
         const { color } = this.props
         const s = {
             ...style,
@@ -99,11 +118,14 @@ export class JumpGame extends React.Component {
                     <div style={styleResult}><i className="material-icons pmd-lg">sentiment_very_satisfied</i></div>
                 }
                 {gameover &&
-                    <button
-                        onClick={this.restart.bind(this)}
-                        className="btn btn-lg pmd-btn-fab pmd-btn-raised pmd-ripple-effect btn-primary" type="button">
-                        <i className="material-icons pmd-sm">replay</i>
-                    </button>
+                    <div>
+                        {lastGames && <JumpScores previousGames={lastGames}/>}
+                        <button
+                            onClick={this.restart.bind(this)}
+                            className="btn btn-lg pmd-btn-fab pmd-btn-raised pmd-ripple-effect btn-primary" type="button">
+                            <i className="material-icons pmd-sm">replay</i>
+                        </button>
+                    </div>
                 }
             </div>
         )

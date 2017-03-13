@@ -34,6 +34,7 @@ app.state = {
     'players': [],
     'ws': [],
     'playing': False,
+    'all_games_ending': [],
 }
 
 
@@ -108,7 +109,8 @@ def startJump():
 
 def onEnd(d):
     app.state['playing'] = False
-    send_notifs({'type': 'end', 'payload': d})
+    app.state['all_games_ending'].append(d)
+    send_notifs({'type': 'end', 'payload': app.state['all_games_ending']})
 
 
 @app.route('/controller', methods=['POST'])
