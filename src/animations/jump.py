@@ -9,8 +9,8 @@ import sys
 import random
 import time
 
-SPEED_ANIMATION = 200
-TIME_TO_SLEEP_BEFORE_START = 4  # seconds
+SPEED_ANIMATION = 1000
+TIME_TO_SLEEP_BEFORE_START = 3  # seconds
 
 
 def complement(r, g, b):
@@ -180,7 +180,7 @@ class Jump(AnimationQueue):
         # game
         self.addAnim(JumpGame(
             led, gamepad, players, onDie=onDie, onEnd=onEnd),
-            fps=45,
+            fps=55,
             untilComplete=True)
         # outro
         self.addAnim(Rainbows.RainbowCycle(led), fps=15)
