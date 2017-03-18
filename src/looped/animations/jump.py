@@ -9,8 +9,8 @@ import sys
 import random
 import time
 
-SPEED_ANIMATION = 1000
-TIME_TO_SLEEP_BEFORE_START = 3  # seconds
+SPEED_ANIMATION = 800
+TIME_TO_SLEEP_BEFORE_START = 2  # seconds
 
 
 def complement(r, g, b):

@@ -92,7 +92,7 @@ def connectJump():
 
 
 def get_connected_players():
-    return [_ for _ in app.state['players'] if _['connected']]
+    return [_ for _ in app.state['players'] if _.get('connected', False)]
 
 
 @app.route('/jump-start', methods=['POST'])
