@@ -7,6 +7,10 @@ from bibliopixel.animation import AnimationQueue
 from animations import BaseGameAnim
 import sys
 import random
+import time
+
+SPEED_ANIMATION = 200
+TIME_TO_SLEEP_BEFORE_START = 4  # seconds
 
 
 def complement(r, g, b):
@@ -42,7 +46,9 @@ class JumpGame(BaseGameAnim):
         self.ball = dict(
             position=0,
             direction=random.choice([1, -1]),
-            speed=0.1,
+            speed=0,
+            speed_to_reach=0,
+            speed_animation=None,
         )
         self.action_delay = 20
         self.players = []
@@ -63,6 +69,10 @@ class JumpGame(BaseGameAnim):
                 lambda i=i: self.jump(player_idx=i)
             )
 
+    def preRun(self, **kwrags):
+        super(JumpGame, self).preRun(**kwrags)
+        self.start_time = time.time()
+
     def jump(self, player_idx):
         if self.players[player_idx].jumping:
             self.players[player_idx].blocking = self.action_delay
@@ -70,14 +80,28 @@ class JumpGame(BaseGameAnim):
         else:
             self.players[player_idx].jumping = self.action_delay
 
+    def get_time(self):
+        return time.time() - self.start_time
+
     def moveBall(self):
-        speed = int(round(1/self.ball['speed']))
-        # do not move depending of speed
-        if self._step % speed:
-            return
-        self.ball['position'] = (
-            self.ball['position'] +
-            (self.ball['direction'])) % self._led.numLEDs
+        if self.ball['speed_to_reach'] <= 0 and self.get_time() > TIME_TO_SLEEP_BEFORE_START:
+            self.speedUpBall(1)
+        # if not self._step % (2 * 60):
+        #     self.speedUpBall(.2)
+        if self.ball['speed_animation']:
+            progress = 1 - (float(self.ball['speed_animation']) / SPEED_ANIMATION)
+            progress = easeInQuad(progress)
+            delta = self.ball['speed_to_reach'] - self.ball['previous_speed']
+            self.ball['speed'] = self.ball['previous_speed'] + (delta * progress)
+            self.ball['speed_animation'] -= 1
+        if self.ball['speed'] > 0:
+            speed = int(round(1/self.ball['speed']))
+            # do not move depending of speed
+            if self._step % speed:
+                return
+            self.ball['position'] = (
+                self.ball['position'] +
+                (self.ball['direction'])) % self._led.numLEDs
 
     def detectColision(self):
         for p in self.players:
@@ -85,7 +109,7 @@ class JumpGame(BaseGameAnim):
                 if not p.blocking and not p.jumping:
                     self.kill(p)
                 elif p.blocking:
-                    self.speedUpBall(.2)
+                    # self.speedUpBall(.2)
                     self.toggleDirection()
 
     def kill(self, player):
@@ -99,7 +123,14 @@ class JumpGame(BaseGameAnim):
         self.ball['direction'] = 0 - self.ball['direction']
 
     def speedUpBall(self, val=0.1):
-        self.ball['speed'] = min(max(self.ball['speed'] + val, 0.1), 1)
+        if val > 0:
+            self.ball['speed_to_reach'] = min(max(self.ball['speed_to_reach'] + val, 0.1), 1)
+            self.ball['speed_animation'] = SPEED_ANIMATION
+            self.ball['previous_speed'] = self.ball['speed']
+        else:
+            self.ball['speed_animation'] = SPEED_ANIMATION
+            self.ball['speed'] = min(max(self.ball['speed'] + val, 0.1), 1)
+            # self.ball['speed_to_reach'] = self.ball['speed']
 
     def end(self):
         if self.onEnd:
@@ -117,8 +148,6 @@ class JumpGame(BaseGameAnim):
         if self.is_time_to_end():
             return self.end()
         self.moveBall()
-        if not self._step % 20:
-            self.speedUpBall()
         self.detectColision()
         self._led.all_off()
         # ball
@@ -162,7 +191,8 @@ if __name__ == '__main__':
     from gamepads import TestGamePad
     gamepad = TestGamePad()
     led = create_led(dev=len(sys.argv) > 1 and sys.argv[1] == 'test')
-    game = Jump(led, gamepad, players=[{'token': _} for _ in range(4)])
+    nb = int(len(sys.argv) > 2 and sys.argv[2] or 3)
+    game = Jump(led, gamepad, players=[{'token': _} for _ in range(nb)])
     try:
         game.run(sleep=15, untilComplete=True)
     except KeyboardInterrupt:
