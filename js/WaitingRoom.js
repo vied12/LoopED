@@ -64,8 +64,13 @@ export class WaitingRoom extends React.Component {
 
     render() {
         const { players, loading, isFirst } = this.state
+        const { color } = players.find((d) => d.token === getCookie('token')) || {}
+        const s = { ...style }
+        if (color) {
+            s.backgroundColor = `rgb(${color[0]}, ${color[1]}, ${color[2]})`
+        }
         return (
-            <div style={style}>
+            <div style={s}>
                 <h2>Waiting room</h2>
                 {loading &&
                     <p className="lead">Loading...</p>
@@ -85,4 +90,11 @@ export class WaitingRoom extends React.Component {
 }
 WaitingRoom.propTypes = { onReady: React.PropTypes.func }
 
-const style = { textAlign: 'center' }
+const style = {
+    textAlign: 'center',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+}

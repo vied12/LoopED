@@ -96,7 +96,7 @@ export class JumpGame extends React.Component {
 
     render() {
         const { status, gameover, lastGames } = this.state
-        const { color } = this.props
+        const { player: { color } } = this.props
         const s = {
             ...style,
             backgroundColor: `rgb(${color[0]}, ${color[1]}, ${color[2]})`,
@@ -150,4 +150,4 @@ const style = {
     WebkitUserSelect: 'none',
     msUserSelect: 'none',
 }
-JumpGame.propTypes = { color: React.PropTypes.array }
+JumpGame.propTypes = { player: React.PropTypes.object }

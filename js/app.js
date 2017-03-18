@@ -11,7 +11,7 @@ function App({ children }) {
     return (children)
 }
 
-function Game(Children) {
+function Game(Children, title) {
     const style = {
         position: 'absolute',
         left: 0,
@@ -23,7 +23,7 @@ function Game(Children) {
         <div>
             <ol className="breadcrumb">
                 <li><Link to="/">Home</Link></li>
-                <li className="active">Jump</li>
+                <li className="active">{title}</li>
             </ol>
             <div style={style}>
                 <Children />
@@ -35,7 +35,7 @@ ReactDOM.render((
     <Router history={hashHistory}>
         <Route path="/" component={App}>
             <IndexRoute component={GameList} />
-            <Route path="jump" component={Game.bind(null, Jump)} />
+            <Route path="jump" component={Game.bind(null, Jump, 'Jump')} />
         </Route>
     </Router>
 ), document.getElementById('reactEntry'))

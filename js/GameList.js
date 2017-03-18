@@ -1,6 +1,13 @@
 import React from 'react'
 import { Link } from 'react-router'
 
+const games = [
+    {
+        link: '/jump',
+        title: 'Jump or Die',
+        description: 'Press once to jump, twice to block. Do not die.',
+    }
+]
 export const GameList = () => {
     return (
         <div>
@@ -8,12 +15,14 @@ export const GameList = () => {
                 LoopED
                 <p className="lead">Applications for a strip led</p>
             </h1>
-            <div className="list-group pmd-z-depth pmd-card-list">
-                <Link to="/jump" className="list-group-item ">
-                    <h3 className="list-group-item-heading">Jump or Die</h3>
-                    <p className="list-group-item-text">Press once to jump, twice to block. Do not die.</p>
-                </Link>
-            </div>
+            {games.map(({ link, title, description }, i) => (
+                <div className="list-group pmd-z-depth pmd-card-list" key={i}>
+                    <Link to={link} className="list-group-item">
+                        <h3 className="list-group-item-heading">{title}</h3>
+                        <p className="list-group-item-text">{description}</p>
+                    </Link>
+                </div>
+            ))}
             <footer style={style.footer}>
                 <div className="container-fluid">
                     <ul className="list-unstyled list-inline">
@@ -23,7 +32,7 @@ export const GameList = () => {
                             </span>
                             <h3 className="pmd-card-subtitle-text">
                                 Licensed under
-                                <a href="https://opensource.org/licenses/MIT" target="_blank">MIT license.</a>
+                                <a href="https://opensource.org/licenses/MIT" target="_blank"> MIT license.</a>
                             </h3>
                         </li>
                     </ul>

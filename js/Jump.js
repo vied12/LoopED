@@ -25,6 +25,6 @@ export class Jump extends React.Component {
         if (waiting) {
             return <WaitingRoom onReady={this.handleOnReady.bind(this)}/>
         }
-        return <JumpGame color={player.color}/>
+        return <JumpGame player={player}/>
     }
 }

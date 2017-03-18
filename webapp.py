@@ -14,7 +14,7 @@ from geventwebsocket.handler import WebSocketHandler
 
 COLORS = [
     colors.Orange,
-    colors.Indigo,
+    (126, 108, 170), # colors.Indigo
     colors.Green,
     colors.Violet,
     colors.Olive,
@@ -78,8 +78,9 @@ def connectJump():
             'color': COLORS[len(app.state['players']) % len(COLORS)]
         }
         app.state['players'].append(player)
+    player['connected'] = True
     data = {
-        'players': app.state['players']
+        'players': get_connected_players()
     }
     send_notifs({'type': 'join', 'payload': data})
     response = app.response_class(
@@ -92,7 +93,7 @@ def connectJump():
 
 
 def get_connected_players():
-    return [_ for _ in app.state['players'] if _.get('connected', False)]
+    return [_ for _ in app.state['players'] if _.get('connected', True)]
 
 
 @app.route('/jump-start', methods=['POST'])
@@ -110,7 +111,7 @@ def startJump():
         onEnd=onEnd)
     app.state['jumpGame'].run(threaded=True, untilComplete=True)
     response = {
-        'players': app.state['players']
+        'players': get_connected_players()
     }
     send_notifs({'type': 'start', 'payload': response})
     return jsonify(response)

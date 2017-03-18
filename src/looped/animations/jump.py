@@ -9,7 +9,7 @@ import sys
 import random
 import time
 
-SPEED_ANIMATION = 800
+SPEED_ANIMATION = 500
 TIME_TO_SLEEP_BEFORE_START = 2  # seconds
 
 
@@ -52,6 +52,7 @@ class JumpGame(BaseGameAnim):
         )
         self.action_delay = 20
         self.players = []
+        random.shuffle(players)
         for i, player in enumerate(players):
             self.players.append(d(
                 position=(self._led.numLEDs / len(players)) * i
