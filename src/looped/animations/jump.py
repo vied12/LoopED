@@ -4,7 +4,7 @@ from bibliopixel import colors
 from bibliopixel.util import d
 from BiblioPixelAnimations.strip import Rainbows, Wave
 from bibliopixel.animation import AnimationQueue
-from animations import BaseGameAnim
+from .BaseGameAnim import BaseGameAnim
 import sys
 import random
 import time

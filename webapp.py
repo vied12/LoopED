@@ -2,9 +2,9 @@
 from flask import Flask, render_template, request, jsonify, abort
 import json
 import uuid
-from Led import create_led
-from animations import Jump
-from gamepads import WebGamePad
+# from Led import create_led
+from looped import Jump, WebGamePad, create_led
+# from gamepads import WebGamePad
 from flask_sockets import Sockets
 import os
 import geventwebsocket
@@ -41,15 +41,13 @@ app.state = {
 @sockets.route('/jump')
 def echo_socket(ws):
     token = request.cookies.get('token')
+    player = next((_ for _ in app.state['players'] if _['token'] == token))
     app.state['ws'].append(ws)
+    player['connected'] = True
     while not ws.closed:
         ws.receive()
     app.state['ws'].remove(ws)
-    remove_player(token)
-
-
-def remove_player(token):
-    app.state['players'] = [_ for _ in app.state['players'] if _['token'] != token]
+    player['connected'] = False
 
 
 @app.route('/')
@@ -93,6 +91,10 @@ def connectJump():
     return response
 
 
+def get_connected_players():
+    return [_ for _ in app.state['players'] if _['connected']]
+
+
 @app.route('/jump-start', methods=['POST'])
 def startJump():
     if app.state['playing']:
@@ -103,7 +105,7 @@ def startJump():
     app.state['jumpGame'] = Jump(
         led,
         gamepad=gamepad,
-        players=app.state['players'],
+        players=get_connected_players(),
         onDie=lambda d: send_notifs({'type': 'die', 'payload': d}),
         onEnd=onEnd)
     app.state['jumpGame'].run(threaded=True, untilComplete=True)

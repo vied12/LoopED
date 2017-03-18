@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from Led import create_led
+from looped import create_led
 from BiblioPixelAnimations.strip import Rainbows, LarsonScanners, Wave, \
     PixelPingPong, Alternates, ColorChase, ColorPattern, ColorWipe, \
     FireFlies, HalvesRainbow, PartyMode, Searchlights, WhiteTwinkle
