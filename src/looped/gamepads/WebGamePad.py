@@ -16,6 +16,6 @@ class WebGamePad(BaseGamePad):
             self.keys[token] = False
         return keys
 
-    @throttle(seconds=1)
+    # @throttle(seconds=1)
     def click(self, token):
         self.keys[token] = True
