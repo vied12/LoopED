@@ -86,8 +86,6 @@ class JumpGame(BaseGameAnim):
     def moveBall(self):
         if self.ball['speed_to_reach'] <= 0 and self.get_time() > TIME_TO_SLEEP_BEFORE_START:
             self.speedUpBall(1)
-        # if not self._step % (2 * 60):
-        #     self.speedUpBall(.2)
         if self.ball['speed_animation']:
             progress = 1 - (float(self.ball['speed_animation']) / SPEED_ANIMATION)
             progress = easeInQuad(progress)
@@ -109,7 +107,6 @@ class JumpGame(BaseGameAnim):
                 if not p.blocking and not p.jumping:
                     self.kill(p)
                 elif p.blocking:
-                    # self.speedUpBall(.2)
                     self.toggleDirection()
 
     def kill(self, player):
@@ -130,7 +127,6 @@ class JumpGame(BaseGameAnim):
         else:
             self.ball['speed_animation'] = SPEED_ANIMATION
             self.ball['speed'] = min(max(self.ball['speed'] + val, 0.1), 1)
-            # self.ball['speed_to_reach'] = self.ball['speed']
 
     def end(self):
         if self.onEnd:

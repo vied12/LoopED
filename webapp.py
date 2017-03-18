@@ -40,9 +40,16 @@ app.state = {
 
 @sockets.route('/jump')
 def echo_socket(ws):
+    token = request.cookies.get('token')
     app.state['ws'].append(ws)
     while not ws.closed:
         ws.receive()
+    app.state['ws'].remove(ws)
+    remove_player(token)
+
+
+def remove_player(token):
+    app.state['players'] = [_ for _ in app.state['players'] if _['token'] != token]
 
 
 @app.route('/')
