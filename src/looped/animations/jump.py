@@ -4,7 +4,7 @@ from bibliopixel import colors
 from bibliopixel.util import d
 from BiblioPixelAnimations.strip import Rainbows, Wave
 from bibliopixel.animation import AnimationQueue
-from .BaseGameAnim import BaseGameAnim
+from looped.animations.BaseGameAnim import BaseGameAnim
 import sys
 import random
 import time
@@ -186,8 +186,8 @@ class Jump(AnimationQueue):
 
 
 if __name__ == '__main__':
-    from Led import create_led
-    from gamepads import TestGamePad
+    from looped.Led import create_led
+    from looped.gamepads import TestGamePad
     gamepad = TestGamePad()
     led = create_led(dev=len(sys.argv) > 1 and sys.argv[1] == 'test')
     nb = int(len(sys.argv) > 2 and sys.argv[2] or 3)

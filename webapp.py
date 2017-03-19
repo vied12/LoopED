@@ -6,11 +6,11 @@ import uuid
 from looped import Jump, WebGamePad, create_led
 # from gamepads import WebGamePad
 from flask_sockets import Sockets
-import os
 import geventwebsocket
 import gevent
 from bibliopixel import colors
 from geventwebsocket.handler import WebSocketHandler
+from BiblioPixelAnimations.strip import Searchlights
 
 NB_ROUNDS = 10
 COLORS = [
@@ -26,7 +26,7 @@ COLORS = [
 
 app = Flask(__name__)
 app.config.from_envvar('SETTINGS')
-led = create_led(dev=os.environ.get('DEV_MODE', False))
+led = create_led(dev=app.config['DEBUG'])
 gamepad = WebGamePad()
 sockets = Sockets(app)
 
@@ -135,4 +135,7 @@ def controller():
 
 if __name__ == '__main__':
     server = gevent.pywsgi.WSGIServer(('0.0.0.0', 8000), app, handler_class=WebSocketHandler)
+    Searchlights.Searchlights(led).run(max_steps=500)
+    led.all_off()
+    led.update()
     server.serve_forever()
