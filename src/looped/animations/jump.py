@@ -107,6 +107,8 @@ class JumpGame(BaseGameAnim):
             if not p['dead'] and p.position == self.ball['position']:
                 if not p.blocking and not p.jumping:
                     self.kill(p)
+                    if random.randint(0, 3) == 0:
+                        self.toggleDirection()
                 elif p.blocking:
                     self.toggleDirection()
 
@@ -165,7 +167,7 @@ class JumpGame(BaseGameAnim):
             elif not p['dead']:
                 self._led.set(p.position, p.color1)
         self.handleKeys()
-        if self._step == 255:
+        if self._step == 2000:
             self._step = 0
 
 

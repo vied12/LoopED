@@ -12,6 +12,7 @@ import gevent
 from bibliopixel import colors
 from geventwebsocket.handler import WebSocketHandler
 
+NB_ROUNDS = 10
 COLORS = [
     colors.Orange,
     (126, 108, 170), # colors.Indigo
@@ -121,6 +122,8 @@ def onEnd(d):
     app.state['playing'] = False
     app.state['all_games_ending'].append(d)
     send_notifs({'type': 'end', 'payload': app.state['all_games_ending']})
+    if len(app.state['all_games_ending']) == NB_ROUNDS:
+        app.state['all_games_ending'] = []
 
 
 @app.route('/controller', methods=['POST'])
