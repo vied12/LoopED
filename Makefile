@@ -26,7 +26,7 @@ install:
 	npm install
 	. env/bin/activate ; pip install -r requirements.txt
 
-start: build run
+start: pull install build run
 
 watch:
 	HOST=$(HOST) $(NODE) node_modules/webpack/bin/webpack.js --watch
