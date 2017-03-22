@@ -11,7 +11,7 @@ ifndef NODE
 	NODE = node
 endif
 
-run:
+run: build
 	. env/bin/activate ; \
 	PYTHONPATH=src/ SETTINGS=settings.py DEV_MODE=$(DEV_MODE) HOST=$(HOST) \
 	./webapp.py
@@ -27,7 +27,7 @@ install:
 	npm install
 	. env/bin/activate ; pip install -r requirements.txt
 
-start: pull install build run
+start: pull install run
 
 watch:
 	HOST=$(HOST) $(NODE) node_modules/webpack/bin/webpack.js --watch
