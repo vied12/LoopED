@@ -6,6 +6,11 @@ const games = [
         link: '/jump',
         title: 'Jump or Die',
         description: 'Press once to jump, twice to block. Do not die.',
+    },
+    {
+        link: '/tuner',
+        title: 'Guitar Tuner',
+        description: 'Analyse the pitch from a microphone and compare with the guitar strings',
     }
 ]
 export const GameList = () => {

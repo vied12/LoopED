@@ -23,6 +23,7 @@ build:
 	HOST=$(HOST) $(NODE) node_modules/webpack/bin/webpack.js
 
 install:
+	sudo apt-get install portaudio19-dev
 	npm install
 	. env/bin/activate ; pip install -r requirements.txt
 

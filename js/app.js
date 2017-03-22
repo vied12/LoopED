@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { GameList } from './GameList'
 import { Jump } from './Jump'
+import { Tuner } from './Tuner'
 import { Router, Route, IndexRoute, Link, hashHistory } from 'react-router'
 import FastClick from 'fastclick'
 
@@ -36,6 +37,7 @@ ReactDOM.render((
         <Route path="/" component={App}>
             <IndexRoute component={GameList} />
             <Route path="jump" component={Game.bind(null, Jump, 'Jump')} />
+            <Route path="tuner" component={Game.bind(null, Tuner, 'Tuner')} />
         </Route>
     </Router>
 ), document.getElementById('reactEntry'))

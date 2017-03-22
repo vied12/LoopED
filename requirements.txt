@@ -8,3 +8,6 @@ flask==0.12
 https://github.com/ManiacalLabs/BiblioPixelAnimations/archive/master.zip
 Flask-Sockets==0.2.1
 gunicorn==19.7.0
+aubio==0.4.4
+PyAudio==0.2.11
+numpy==1.12.1

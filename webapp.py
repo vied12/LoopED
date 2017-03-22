@@ -2,9 +2,7 @@
 from flask import Flask, render_template, request, jsonify, abort
 import json
 import uuid
-# from Led import create_led
-from looped import Jump, WebGamePad, create_led
-# from gamepads import WebGamePad
+from looped import Jump, WebGamePad, create_led, Tuner
 from flask_sockets import Sockets
 import geventwebsocket
 import gevent
@@ -15,7 +13,7 @@ from BiblioPixelAnimations.strip import Searchlights
 NB_ROUNDS = 10
 COLORS = [
     colors.Orange,
-    (126, 108, 170), # colors.Indigo
+    (126, 108, 170),  # colors.Indigo
     colors.Green,
     colors.Violet,
     colors.Olive,
@@ -31,7 +29,7 @@ gamepad = WebGamePad()
 sockets = Sockets(app)
 
 app.state = {
-    'jumpGame': None,
+    'current_animation': None,
     'players': [],
     'ws': [],
     'playing': False,
@@ -99,18 +97,22 @@ def get_connected_players():
 
 @app.route('/jump-start', methods=['POST'])
 def startJump():
+    def onEnd(d):
+        app.state['playing'] = False
+        app.state['all_games_ending'].append(d)
+        send_notifs({'type': 'end', 'payload': app.state['all_games_ending']})
+        if len(app.state['all_games_ending']) == NB_ROUNDS:
+            app.state['all_games_ending'] = []
     if app.state['playing']:
         return abort(400)
-    if app.state['jumpGame']:
-        app.state['jumpGame'].stopThread(wait=True)
     app.state['playing'] = True
-    app.state['jumpGame'] = Jump(
+    run_animation(Jump(
         led,
         gamepad=gamepad,
         players=get_connected_players(),
         onDie=lambda d: send_notifs({'type': 'die', 'payload': d}),
-        onEnd=onEnd)
-    app.state['jumpGame'].run(threaded=True, untilComplete=True)
+        onEnd=onEnd
+    ), untilComplete=True)
     response = {
         'players': get_connected_players()
     }
@@ -118,12 +120,10 @@ def startJump():
     return jsonify(response)
 
 
-def onEnd(d):
-    app.state['playing'] = False
-    app.state['all_games_ending'].append(d)
-    send_notifs({'type': 'end', 'payload': app.state['all_games_ending']})
-    if len(app.state['all_games_ending']) == NB_ROUNDS:
-        app.state['all_games_ending'] = []
+@app.route('/tuner', methods=['POST'])
+def tuner():
+    run_animation(Tuner(led))
+    return 'ok'
 
 
 @app.route('/controller', methods=['POST'])
@@ -133,9 +133,15 @@ def controller():
     return 'ok'
 
 
+def run_animation(anim, **kwargs):
+    if app.state['current_animation']:
+        app.state['current_animation'].stopThread(wait=True)
+        app.state['current_animation'] = None
+    app.state['current_animation'] = anim
+    app.state['current_animation'].run(threaded=True, **kwargs)
+
+
 if __name__ == '__main__':
     server = gevent.pywsgi.WSGIServer(('0.0.0.0', 8000), app, handler_class=WebSocketHandler)
-    Searchlights.Searchlights(led).run(max_steps=500)
-    led.all_off()
-    led.update()
+    run_animation(Searchlights.Searchlights(led), max_steps=500)
     server.serve_forever()

@@ -16,7 +16,7 @@ STRINGS = [
 ]
 
 
-def listen(response):
+def record(response):
     # initialise pyaudio
     p = pyaudio.PyAudio()
     # open stream
@@ -35,7 +35,7 @@ def listen(response):
     hop_s = buffer_size  # hop size
     pitch_o = aubio.pitch('default', win_s, hop_s, samplerate)
     pitch_o.set_tolerance(tolerance)
-    while True:
+    while response['continue']:
         audiobuffer = stream.read(buffer_size)
         signal = np.fromstring(audiobuffer, dtype=np.float32)
         pitch = pitch_o(signal)[0]
@@ -55,10 +55,15 @@ class Tuner(BaseStripAnim):
 
     def preRun(self, **kwrags):
         super(Tuner, self).preRun(**kwrags)
-        self.response = {'value': None}
-        self.tuner_thread = threading.Thread(target=listen, args=(self.response,))
+        self.thread_state = {'value': None, 'continue': True}
+        self.tuner_thread = threading.Thread(target=record, args=(self.thread_state,))
         self.tuner_thread.setDaemon(True)
         self.tuner_thread.start()
+
+    def _exit(self, *args, **kwrags):
+        super(Tuner, self)._exit(*args, **kwrags)
+        self.thread_state['continue'] = False
+        self.tuner_thread.join()
 
     def get_closer_note(self, pitch):
         return min(STRINGS, key=lambda x: abs(x - pitch))
@@ -73,7 +78,7 @@ class Tuner(BaseStripAnim):
             for o in range(1, self.padding + 1):
                 self._led.set((pos + o) % self._led.numLEDs, colors.White)
                 self._led.set((pos - o) % self._led.numLEDs, colors.White)
-        pitch = self.response['value']
+        pitch = self.thread_state['value']
         if pitch:
             wanted_note = self.get_closer_note(pitch)
             delta = wanted_note - pitch
@@ -101,6 +106,5 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         led.all_off()
         led.update()
-        # anim.tuner_thread.join()
         import os
         os._exit(0)
