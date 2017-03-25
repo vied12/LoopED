@@ -142,6 +142,6 @@ def run_animation(anim, **kwargs):
 
 
 if __name__ == '__main__':
-    server = gevent.pywsgi.WSGIServer(('0.0.0.0', 8000), app, handler_class=WebSocketHandler)
+    server = gevent.pywsgi.WSGIServer(('0.0.0.0', app.config['PORT']), app, handler_class=WebSocketHandler)
     run_animation(Searchlights.Searchlights(led), max_steps=500)
     server.serve_forever()

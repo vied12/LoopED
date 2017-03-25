@@ -23,7 +23,7 @@ def record(response):
     buffer_size = 1024
     pyaudio_format = pyaudio.paFloat32
     n_channels = 1
-    samplerate = 44100
+    samplerate = 16000
     stream = p.open(format=pyaudio_format,
                     channels=n_channels,
                     rate=samplerate,
@@ -36,11 +36,11 @@ def record(response):
     pitch_o = aubio.pitch('default', win_s, hop_s, samplerate)
     pitch_o.set_tolerance(tolerance)
     while response['continue']:
-        audiobuffer = stream.read(buffer_size)
+        audiobuffer = stream.read(buffer_size, exception_on_overflow=False)
         signal = np.fromstring(audiobuffer, dtype=np.float32)
         pitch = pitch_o(signal)[0]
         confidence = pitch_o.get_confidence()
-        if confidence > .7:
+        if confidence > .6:
             response['value'] = pitch
         else:
             response['value'] = None

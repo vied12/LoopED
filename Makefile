@@ -1,5 +1,8 @@
+ifndef PORT
+	PORT = 8000
+endif
 ifndef HOST
-	HOST = "localhost:8000"
+	HOST = "localhost:$(PORT)"
 endif
 
 ifndef DEV_MODE
