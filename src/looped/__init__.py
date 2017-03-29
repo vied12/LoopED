@@ -1,5 +1,5 @@
 from .Led import create_led
-from .animations import Jump, Tuner
+from .animations import Jump, Tuner, Intro
 from .gamepads import WebGamePad
 
 __all__ = [
@@ -7,4 +7,5 @@ __all__ = [
     'Jump',
     'WebGamePad',
     'Tuner',
+    'Intro',
 ]

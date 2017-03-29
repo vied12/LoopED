@@ -2,13 +2,12 @@
 from flask import Flask, render_template, request, jsonify, abort
 import json
 import uuid
-from looped import Jump, WebGamePad, create_led, Tuner
+from looped import Jump, WebGamePad, create_led, Tuner, Intro
 from flask_sockets import Sockets
 import geventwebsocket
 import gevent
 from bibliopixel import colors
 from geventwebsocket.handler import WebSocketHandler
-from BiblioPixelAnimations.strip import Searchlights
 
 NB_ROUNDS = 10
 COLORS = [
@@ -143,5 +142,5 @@ def run_animation(anim, **kwargs):
 
 if __name__ == '__main__':
     server = gevent.pywsgi.WSGIServer(('0.0.0.0', app.config['PORT']), app, handler_class=WebSocketHandler)
-    run_animation(Searchlights.Searchlights(led), max_steps=500)
+    run_animation(Intro(led), untilComplete=True)
     server.serve_forever()

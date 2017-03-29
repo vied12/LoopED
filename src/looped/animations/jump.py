@@ -89,7 +89,7 @@ class JumpGame(BaseGameAnim):
             self.speedUpBall(1)
         if self.ball['speed_animation']:
             progress = 1 - (float(self.ball['speed_animation']) / SPEED_ANIMATION)
-            progress = easeInQuad(progress)
+            # progress = easeInQuad(progress)
             delta = self.ball['speed_to_reach'] - self.ball['previous_speed']
             self.ball['speed'] = self.ball['previous_speed'] + (delta * progress)
             self.ball['speed_animation'] -= 1
