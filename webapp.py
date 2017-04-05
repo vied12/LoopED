@@ -135,7 +135,7 @@ def controller():
 
 @app.route('/metronome', methods=['POST'])
 def metronome():
-    run_animation(Metronome(led, gamepad=gamepad))
+    run_animation(Metronome(led, gamepad=gamepad), fps=30)
     return 'ok'
 
 
