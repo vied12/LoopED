@@ -11,7 +11,12 @@ const games = [
         link: '/tuner',
         title: 'Guitar Tuner',
         description: 'Analyse the pitch from a microphone and compare with the guitar strings',
-    }
+    },
+    {
+        link: '/metronome',
+        title: 'Metronome',
+        description: 'Set a tempo and feel the rythm',
+    },
 ]
 export const GameList = () => {
     return (

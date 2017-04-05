@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import { GameList } from './GameList'
 import { Jump } from './Jump'
 import { Tuner } from './Tuner'
+import Metronome from './Metronome'
 import { Router, Route, IndexRoute, Link, hashHistory } from 'react-router'
 import FastClick from 'fastclick'
 
@@ -38,6 +39,7 @@ ReactDOM.render((
             <IndexRoute component={GameList} />
             <Route path="jump" component={Game.bind(null, Jump, 'Jump')} />
             <Route path="tuner" component={Game.bind(null, Tuner, 'Tuner')} />
+            <Route path="metronome" component={Game.bind(null, Metronome, 'Metronome')} />
         </Route>
     </Router>
 ), document.getElementById('reactEntry'))

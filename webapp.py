@@ -2,7 +2,7 @@
 from flask import Flask, render_template, request, jsonify, abort
 import json
 import uuid
-from looped import Jump, WebGamePad, create_led, Tuner, Intro
+from looped import Jump, WebGamePad, create_led, Tuner, Intro, Metronome
 from flask_sockets import Sockets
 import geventwebsocket
 import gevent
@@ -128,7 +128,14 @@ def tuner():
 @app.route('/controller', methods=['POST'])
 def controller():
     token = request.cookies.get('token')
-    gamepad.click(token)
+    key = request.json and request.json.get('key') or None
+    gamepad.click(key or token)
+    return 'ok'
+
+
+@app.route('/metronome', methods=['POST'])
+def metronome():
+    run_animation(Metronome(led, gamepad=gamepad))
     return 'ok'
 
 
