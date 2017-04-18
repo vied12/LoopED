@@ -135,9 +135,9 @@ def controller():
 
 @app.route('/metronome', methods=['POST'])
 def metronome():
-    print(request.json)
     bpm = request.json and int(request.json.get('bpm')) or None
-    run_animation(Metronome(led, gamepad=gamepad, bpm=bpm), fps=30)
+    color = request.json and request.json.get('color') or None
+    run_animation(Metronome(led, gamepad=gamepad, bpm=bpm, color=color), fps=30)
     return 'ok'
 
 

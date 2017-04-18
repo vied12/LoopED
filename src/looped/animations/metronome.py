@@ -1,5 +1,3 @@
-from bibliopixel.animation import AnimationQueue, OffAnim, BaseStripAnim
-from BiblioPixelAnimations.strip import ColorPattern
 from looped.animations.BaseGameAnim import BaseGameAnim
 from bibliopixel import colors
 import time
@@ -7,21 +5,13 @@ import sys
 
 
 class Metronome(BaseGameAnim):
-    def __init__(self, led, gamepad, start=0, end=-1, bpm=30):
+    def __init__(self, led, gamepad, start=0, end=-1, bpm=30, color=colors.Red):
         super(Metronome, self).__init__(led, start, end, gamepad)
         self.last_click = time.time()
         self.bpm = bpm
+        self.color = color
         self.clickAnim = None
-        self.addKeyFunc('1', self.click)
         self.last_click_call = None
-
-    def click(self):
-        current_time = time.time()
-        if self.last_click_call:
-            delta_sec = current_time - self.last_click_call
-            self.bpm = 60.0 / delta_sec
-        self.last_click_call = current_time
-        self.trigger_click(current_time)
 
     def trigger_click(self, _time=None):
         _time = _time and _time or time.time()
@@ -29,12 +19,11 @@ class Metronome(BaseGameAnim):
         self.clickAnim = _time
 
     def step(self, amt=1):
-        self.handleKeys()
         current_time = time.time()
         if not self.clickAnim and current_time - self.last_click >= 60.0 / self.bpm:
             self.trigger_click(current_time)
         if self.clickAnim:
-            self._led.fill(colors.White)
+            self._led.fill(self.color)
             if current_time - self.clickAnim > (60.0 / self.bpm) / 2.0:
                 self.clickAnim = None
         else:

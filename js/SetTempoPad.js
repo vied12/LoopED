@@ -20,6 +20,7 @@ export default class SetTempo extends React.Component {
         return <div style={setTempoStyle} onClick={this.onClick.bind(this)}/>
     }
 }
+
 SetTempo.propTypes = { onChange: React.PropTypes.func }
 const setTempoStyle = {
     width: 100,
