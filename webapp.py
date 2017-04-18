@@ -14,10 +14,10 @@ COLORS = [
     colors.Orange,
     (126, 108, 170),  # colors.Indigo
     colors.Green,
-    colors.Violet,
     colors.Olive,
     colors.Blue,
     colors.Yellow,
+    colors.Violet,
 ]
 
 
@@ -135,7 +135,9 @@ def controller():
 
 @app.route('/metronome', methods=['POST'])
 def metronome():
-    run_animation(Metronome(led, gamepad=gamepad), fps=30)
+    print(request.json)
+    bpm = request.json and int(request.json.get('bpm')) or None
+    run_animation(Metronome(led, gamepad=gamepad, bpm=bpm), fps=30)
     return 'ok'
 
 

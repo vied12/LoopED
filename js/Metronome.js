@@ -1,40 +1,12 @@
 import React from 'react'
+import { default as SetTempoPad } from './SetTempoPad'
 import { BackButton } from './BackButton'
-class SetTempo extends React.Component {
-    constructor(props) {
-        super(props)
-        this.previousClick = null
-        // this.state = { bpm: null }
-    }
-    onClick() {
-        if (this.previousClick) {
-            const now = new Date().getTime()
-            const deltaSeconds = (now - this.previousClick) / 1000
-            this.props.onBpm(60 / (deltaSeconds))
-            // this.setState({ bpm: 60 / (deltaSeconds) })
-            this.previousClick = now
-        } else {
-            this.previousClick = new Date().getTime()
-        }
-    }
 
-    render() {
-        return <div style={setTempoStyle} onClick={this.onClick.bind(this)}/>
-    }
-}
-SetTempo.propTypes = { onBpm: React.PropTypes.func }
-const setTempoStyle = {
-    width: 100,
-    height: 100,
-    backgroundColor: 'gray',
-    margin: 'auto',
-    marginTop: 40,
-}
 export default class extends React.Component {
 
     constructor(props) {
         super(props)
-        this.state = { bpm: null }
+        this.state = { bpm: 60 }
     }
 
     componentDidMount() {
@@ -45,11 +17,11 @@ export default class extends React.Component {
     }
 
     onBpm(bpm) {
-        fetch('/controller', {
+        fetch('/metronome', {
             credentials: 'same-origin',
             headers: { 'Content-Type': 'application/json' },
             method: 'POST',
-            body: JSON.stringify({ key: '1' })
+            body: JSON.stringify({ bpm }),
         })
         this.setState({ bpm: bpm })
     }
@@ -57,19 +29,21 @@ export default class extends React.Component {
     render() {
         const { bpm } = this.state
         return (
-            <div>
-                <SetTempo onBpm={this.onBpm.bind(this)}/>
-                <div style={metroStyle}>
-                    {bpm &&
-                        <span>{Math.round(bpm)} bpm</span>
-                    }
-                </div>
+            <div style={style}>
+                <SetTempoPad onChange={this.onBpm.bind(this)}/>
+                <span style={inputStyle}>
+                    <input type="number" value={bpm} onChange={(e) => this.onBpm(e.target.value)}/> bpm
+                </span>
                 <BackButton/>
             </div>
         )
     }
 }
-const metroStyle = {
+const inputStyle = {
+    textAlign: 'center',
+    marginTop: 20,
+}
+const style = {
     textAlign: 'center',
     fontSize: '2em',
 }
