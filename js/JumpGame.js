@@ -4,6 +4,8 @@ import { JumpScores } from './JumpScores'
 import { isNil } from 'lodash'
 import { getCookie, startLEDGame } from './util'
 
+navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate
+
 export class JumpGame extends React.Component {
 
     constructor(props) {
@@ -29,11 +31,11 @@ export class JumpGame extends React.Component {
         this.wsEnd.onmessage = (event) => {
             const data = JSON.parse(event.data)
             const token = getCookie('token')
-            navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate
             const action = [
                 {
                     type: 'start',
                     do: () => {
+                        navigator.vibrate([100, 100, 100])
                         this.setState({
                             status: null,
                             gameover: false,
