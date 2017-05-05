@@ -23,7 +23,7 @@ COLORS = [
 
 app = Flask(__name__)
 app.config.from_envvar('SETTINGS')
-led = create_led(dev=app.config['DEBUG'])
+led = create_led(dev=app.config['DEBUG'], length=app.config['STRIP_LENGTH'])
 gamepad = WebGamePad()
 sockets = Sockets(app)
 
