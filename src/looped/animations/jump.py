@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from bibliopixel import colors
-from bibliopixel.util import d
 from BiblioPixelAnimations.strip import Rainbows, Wave
 from bibliopixel.animation import AnimationQueue
 from looped.animations.BaseGameAnim import BaseGameAnim
@@ -54,7 +53,7 @@ class JumpGame(BaseGameAnim):
         self.players = []
         random.shuffle(players)
         for i, player in enumerate(players):
-            self.players.append(d(
+            self.players.append(dict(
                 position=(self._led.numLEDs / len(players)) * i
                 + (self._led.numLEDs / len(players)) / 2,
                 jumping=0,
@@ -104,12 +103,12 @@ class JumpGame(BaseGameAnim):
 
     def detectColision(self):
         for p in self.players:
-            if not p['dead'] and p.position == self.ball['position']:
-                if not p.blocking and not p.jumping:
+            if not p['dead'] and p['position'] is self.ball['position']:
+                if not p['blocking'] and not p['jumping']:
                     self.kill(p)
                     if random.randint(0, 3) == 0:
                         self.toggleDirection()
-                elif p.blocking:
+                elif p['blocking']:
                     self.toggleDirection()
 
     def kill(self, player):
@@ -153,19 +152,19 @@ class JumpGame(BaseGameAnim):
         self._led.set(self.ball['position'], colors.White)
         # players
         for p in self.players:
-            if p.diying:
-                if not p.diying % 3:
-                    self._led.set(p.position, colors.White)
+            if p['diying']:
+                if not p['diying'] % 3:
+                    self._led.set(p['position'], colors.White)
                 else:
-                    self._led.set(p.position, p.color2)
+                    self._led.set(p['position'], p['color2'])
                 p['diying'] -= 1
-            elif p.jumping:
-                p.jumping -= 1
-            elif p.blocking:
-                self._led.set(p.position, colors.Red)
-                p.blocking -= 1
+            elif p['jumping']:
+                p['jumping'] -= 1
+            elif p['blocking']:
+                self._led.set(p['position'], colors.Red)
+                p['blocking'] -= 1
             elif not p['dead']:
-                self._led.set(p.position, p.color1)
+                self._led.set(p['position'], p['color1'])
         self.handleKeys()
         if self._step == 2000:
             self._step = 0
