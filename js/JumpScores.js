@@ -3,16 +3,8 @@ import React from 'react'
 import { orderBy } from 'lodash'
 
 function valuesFromLastGames(previousGames) {
-    // const token = getCookie('token')
-    // var won = 0
-    // var lost = 0
     var players = {}
     previousGames.forEach((game) => {
-        // if (game.find((d) => (!d.dead && d.token == token))) {
-        //     won += 1
-        // } else if (game.find((d) => (d.token == token))) {
-        //     lost += 1
-        // }
         game.forEach((player) => {
             if (!players[player.token]) {
                 players[player.token] = {
@@ -27,16 +19,6 @@ function valuesFromLastGames(previousGames) {
     })
 
     return [
-        // {
-        //     name: 'won',
-        //     percent: (won / (won + lost)) * 100,
-        //     value: won,
-        // },
-        // {
-        //     name: 'lost',
-        //     percent: (lost / (won + lost)) * 100,
-        //     value: lost,
-        // },
         ...orderBy(Object.keys(players).map((pKey) => (
             {
                 name: <div className="color" style={{

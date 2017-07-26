@@ -11,12 +11,11 @@ from geventwebsocket.handler import WebSocketHandler
 
 NB_ROUNDS = 10
 COLORS = [
-    colors.Blue,
+    colors.Turquoise,
     colors.Green,
     colors.Yellow,
     colors.Orange,
     colors.Purple,
-    colors.Cyan,
     colors.Magenta,
     colors.Coral,
 ]
