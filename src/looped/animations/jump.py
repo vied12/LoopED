@@ -74,11 +74,13 @@ class JumpGame(BaseGameAnim):
         self.start_time = time.time()
 
     def jump(self, player_idx):
-        if self.players[player_idx].jumping:
-            self.players[player_idx].blocking = self.action_delay
-            self.players[player_idx].jumping = 0
+        if self.players[player_idx]['jumping']:
+            self.players[player_idx].update({
+                'jumping': 0,
+                'blocking': self.action_delay,
+            })
         else:
-            self.players[player_idx].jumping = self.action_delay
+            self.players[player_idx]['jumping'] = self.action_delay
 
     def get_time(self):
         return time.time() - self.start_time
@@ -90,8 +92,10 @@ class JumpGame(BaseGameAnim):
             progress = 1 - (float(self.ball['speed_animation']) / SPEED_ANIMATION)
             # progress = easeInQuad(progress)
             delta = self.ball['speed_to_reach'] - self.ball['previous_speed']
-            self.ball['speed'] = self.ball['previous_speed'] + (delta * progress)
-            self.ball['speed_animation'] -= 1
+            self.ball.update({
+                'speed': self.ball['previous_speed'] + (delta * progress),
+                'speed_animation': self.ball['speed_animation'] - 1
+            })
         if self.ball['speed'] > 0:
             speed = int(round(1/self.ball['speed']))
             # do not move depending of speed
@@ -103,7 +107,7 @@ class JumpGame(BaseGameAnim):
 
     def detectColision(self):
         for p in self.players:
-            if not p['dead'] and p['position'] is self.ball['position']:
+            if p['position'] is self.ball['position'] and not p['dead']:
                 if not p['blocking'] and not p['jumping']:
                     self.kill(p)
                     if random.randint(0, 3) == 0:
@@ -112,8 +116,10 @@ class JumpGame(BaseGameAnim):
                     self.toggleDirection()
 
     def kill(self, player):
-        player['dead'] = True
-        player['diying'] = self.action_delay * 2
+        player.update({
+            'dead': True,
+            'diying': self.action_delay * 2,
+        })
         self.speedUpBall(-.4)
         if self.onDie:
             self.onDie(self.players)
@@ -123,12 +129,16 @@ class JumpGame(BaseGameAnim):
 
     def speedUpBall(self, val=0.1):
         if val > 0:
-            self.ball['speed_to_reach'] = min(max(self.ball['speed_to_reach'] + val, 0.1), 1)
-            self.ball['speed_animation'] = SPEED_ANIMATION
-            self.ball['previous_speed'] = self.ball['speed']
+            self.ball.update({
+                'speed_to_reach': min(max(self.ball['speed_to_reach'] + val, 0.1), 1),
+                'speed_animation': SPEED_ANIMATION,
+                'previous_speed': self.ball['speed'],
+            })
         else:
-            self.ball['speed_animation'] = SPEED_ANIMATION
-            self.ball['speed'] = min(max(self.ball['speed'] + val, 0.1), 1)
+            self.ball.update({
+                'speed_animation': SPEED_ANIMATION,
+                'speed': min(max(self.ball['speed'] + val, 0.1), 1),
+            })
 
     def end(self):
         if self.onEnd:
