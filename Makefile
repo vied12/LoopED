@@ -15,9 +15,8 @@ ifndef NODE
 endif
 
 run:
-	. env/bin/activate ; \
-	PYTHONPATH=src/ SETTINGS=settings.py DEV_MODE=$(DEV_MODE) HOST=$(HOST) \
-	./webapp.py
+	SETTINGS=../settings.py DEV_MODE=$(DEV_MODE) HOST=$(HOST) \
+	pipenv run src/webapp.py
 
 pull:
 	git pull
@@ -28,7 +27,7 @@ build:
 install:
 	sudo apt-get install portaudio19-dev
 	npm install
-	. env/bin/activate ; pip install -r requirements.txt
+	pipenv install
 
 start: pull install build run
 
