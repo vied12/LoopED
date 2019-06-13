@@ -1,7 +1,8 @@
 import React from 'react'
-// import { getCookie } from './util'
 import { orderBy } from 'lodash'
-import PropTypes from 'prop-types'
+import Typography from '@material-ui/core/Typography'
+import ColorBox from './ColorBox'
+import { makeStyles } from '@material-ui/core'
 
 function valuesFromLastGames(previousGames) {
   var players = {}
@@ -22,17 +23,7 @@ function valuesFromLastGames(previousGames) {
   return [
     ...orderBy(
       Object.keys(players).map(pKey => ({
-        name: (
-          <div
-            className="color"
-            style={{
-              ...styleColor,
-              backgroundColor: `rgb(${players[pKey].color[0]}, ${
-                players[pKey].color[1]
-              }, ${players[pKey].color[2]})`
-            }}
-          />
-        ),
+        color: players[pKey].color,
         value: players[pKey].won
       })),
       ['value'],
@@ -41,30 +32,27 @@ function valuesFromLastGames(previousGames) {
   ]
 }
 
-export const JumpScores = ({ previousGames }) => (
-  <table style={style}>
-    <tbody>
-      {valuesFromLastGames(previousGames).map(({ name, value, percent }, i) => (
-        <tr key={i}>
-          <td className="media-left">{name}</td>
-          <td className="media-right">{value}</td>
-        </tr>
+const useStyles = makeStyles(theme => ({
+  root: { margin: '40px 0' },
+  line: {
+    display: 'flex',
+    alignItems: 'center'
+  }
+}))
+
+export const JumpScores = ({ previousGames }) => {
+  const classes = useStyles()
+  return (
+    <div className={classes.root}>
+      <Typography variant="h6">Scores:</Typography>
+      {valuesFromLastGames(previousGames).map(({ color, value }, i) => (
+        <div key={color} className={classes.line}>
+          <ColorBox color={color} />
+          <div style={{ paddingLeft: 20 }}>
+            <Typography>{value}</Typography>
+          </div>
+        </div>
       ))}
-    </tbody>
-  </table>
-)
-
-JumpScores.propTypes = { previousGames: PropTypes.array }
-
-const style = {
-  maxWidth: 400,
-  margin: 'auto',
-  marginBottom: 40,
-  fontFamily: "'Gloria Hallelujah', cursive"
-}
-const styleColor = {
-  border: '1px solid black',
-  width: 25,
-  marginBottom: 5,
-  height: 25
+    </div>
+  )
 }

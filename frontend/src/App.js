@@ -1,7 +1,6 @@
 import React from 'react'
 import Intro from './Intro'
-import PlayGame from './PlayGame'
-import WaitForNextParty from './WaitForNextParty'
+import Mor from './Mor'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 import FastClick from 'fastclick'
@@ -41,8 +40,7 @@ function App() {
       <CssBaseline />
       <Router>
         <Route path="/" exact component={Intro}></Route>
-        <Route path="/wait" exact component={WaitForNextParty}></Route>
-        <Route path="/play" exact component={PlayGame}></Route>
+        <Route path="/mor" component={Mor}></Route>
       </Router>
     </ThemeProvider>
   )

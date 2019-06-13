@@ -47,24 +47,25 @@ def controller_socket(ws):
 @sockets.route('/jump')
 def echo_socket(ws):
     token = request.cookies.get('token')
-    print('connecting', token)
+    app.state['ws'].append(ws)
     try:
         player = next((_ for _ in app.state['players'] if _['token'] == token))
         player['connected'] = True
-        app.state['ws'].append(ws)
-        print('connected', player, app.state['players'])
     except StopIteration:
-        print('user not found', token)
+        pass
     while not ws.closed:
         ws.receive()
-    print('disconnect', token)
-    app.state['ws'].remove(ws)
+    if ws in app.state['ws']:
+        app.state['ws'].remove(ws)
     try:
         player = next((_ for _ in app.state['players'] if _['token'] == token))
         player['connected'] = False
     except StopIteration:
-        print('user not found', token)
-    print('players after disc', app.state['players'])
+        pass
+    send_notifs({'type': 'join', 'payload': {
+        'players': get_connected_players()
+    } })
+
 
 @app.route('/')
 def serve_react_app():
@@ -86,7 +87,6 @@ def send_notifs(msg):
 
 @app.route('/jump-status')
 def jump_status():
-    print('p', app.state['players'])
     data = {
         'players': get_connected_players(),
         'playing': app.state['playing'],

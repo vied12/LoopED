@@ -26,7 +26,7 @@ build:
 
 install:
 	sudo apt-get install portaudio19-dev
-	npm install
+	npm run build
 	pipenv install
 
 start: pull install build run

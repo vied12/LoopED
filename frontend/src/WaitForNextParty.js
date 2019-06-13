@@ -8,6 +8,7 @@ import { startLEDGame } from './util'
 import { getCookie } from './util'
 import find from 'lodash/find'
 import ColorBox from './ColorBox'
+import { useWebsocket } from './useWebsocket'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -34,22 +35,47 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-const WaitForNextParty = () => {
+const WaitForNextParty = ({ history, initialGameProps, ws }) => {
   const classes = useStyles()
-  const gameProps = useGameConnect()
+  // // const gameProps = useGameConnect()
+  const [players, setPlayers] = React.useState(initialGameProps.players)
+  // const [ws, gameProps] = useWebsocket()
+  React.useEffect(() => {
+    if (ws) {
+      ws.onmessage = event => {
+        const data = JSON.parse(event.data)
+        switch (data.type) {
+          case 'start': // party started
+            history.push('/mor/play')
+            break
+          case 'join': //someone joined
+            setPlayers(data.payload.players)
+            break
+          default:
+            console.log('dont know', data)
+        }
+      }
+    }
+    return () => {
+      if (ws) {
+        ws.onmessage = undefined
+      }
+    }
+  }, [ws, history])
   const token = getCookie('token')
-  const me =
-    gameProps.players && find(gameProps.players, p => p.token === token)
+  const me = players && find(players, p => p.token === token)
   return (
     <div className={classes.root}>
       {me && me.color && (
         <div className={classes.displayColor}>
           <Typography>Your color is</Typography>
-          <ColorBox color={me.color} />
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <ColorBox color={me.color} />
+          </div>
         </div>
       )}
       <div className={classes.body}>
-        {gameProps && gameProps.isFirst ? (
+        {initialGameProps && initialGameProps.isFirst ? (
           <Button variant="contained" color="primary" onClick={startLEDGame}>
             Start
           </Button>
@@ -63,10 +89,10 @@ const WaitForNextParty = () => {
           </div>
         )}
       </div>
-      {gameProps.players && (
+      {players && (
         <Typography variant="body2" color="textSecondary">
-          {gameProps.players.length} player
-          {gameProps.players.length < 2 ? ' is ' : 's are '} in the game
+          {players.length} player
+          {players.length < 2 ? ' is ' : 's are '} in the game
         </Typography>
       )}
     </div>

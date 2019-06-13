@@ -41,7 +41,7 @@ const useStyles = makeStyles(theme => ({
 
 const Intro = () => {
   const classes = useStyles()
-  const gameProps = useGameStatus()
+  const gameProps = useGameStatus({ gameover: true })
   return (
     <div className={classes.root}>
       <div className={classes.hero}>
@@ -87,7 +87,7 @@ const Intro = () => {
         color="primary"
         disabled={!gameProps}
         component={Link}
-        to="/wait"
+        to="/mor/wait"
       >
         Join the party
       </Button>

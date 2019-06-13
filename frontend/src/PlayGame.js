@@ -14,6 +14,7 @@ import { makeStyles } from '@material-ui/styles'
 import deadImg from './dead.png'
 import Slide from '@material-ui/core/Slide'
 import Grow from '@material-ui/core/Grow'
+import ColorBox from './ColorBox'
 
 const useCenterStyles = makeStyles(theme => ({
   root: {
@@ -31,9 +32,10 @@ const Center = props => {
   return <div className={classes.root} {...props} />
 }
 
-const PlayGame = () => {
+const PlayGame = ({ ws }) => {
   const [state, setState] = React.useState({})
   const handleJump = useController()
+  // const ws = useWebsocket()
 
   const restart = e => {
     e.preventDefault()
@@ -47,76 +49,78 @@ const PlayGame = () => {
   }
 
   React.useEffect(() => {
-    console.log('play -> connect to ws')
-    const ws = new WebSocket(`ws://localhost:8000/jump`)
-    ws.onerror = event => {
-      console.error('ws err', event)
-    }
-    ws.onmessage = event => {
-      const data = JSON.parse(event.data)
-      const token = getCookie('token')
-      const action = [
-        {
-          type: 'start',
-          do: () => {
-            navigator.vibrate([100, 100, 100])
-            setState({
-              status: null,
-              gameover: false
-            })
-          }
-        },
-        {
-          type: 'end',
-          do: () => {
-            const lastGamePlayers = data.payload[data.payload.length - 1]
-            const status = lastGamePlayers.find(
-              d => d.dead && d.token === token
-            )
-              ? 'loose'
-              : 'win'
-            if (status === 'win') {
-              navigator.vibrate([100, 100, 100, 100, 100])
+    // const ws = new WebSocket(`ws://localhost:8000/jump`)
+    if (ws) {
+      ws.onerror = event => {
+        console.error('ws err', event)
+      }
+      ws.onmessage = event => {
+        const data = JSON.parse(event.data)
+        const token = getCookie('token')
+        const action = [
+          {
+            type: 'start',
+            do: () => {
+              navigator.vibrate([100, 100, 100])
+              setState({
+                status: null,
+                gameover: false
+              })
             }
-            setState({
-              status: status,
-              gameover: true,
-              lastGames: data.payload
-            })
-          }
-        },
-        {
-          type: 'die',
-          do: () => {
-            const players = data.payload
-            if (players.find(d => d.dead && d.token === token)) {
-              navigator.vibrate(1000)
-              setState({ status: 'loose' })
+          },
+          {
+            type: 'end',
+            do: () => {
+              const lastGamePlayers = data.payload[data.payload.length - 1]
+              const status = lastGamePlayers.find(
+                d => d.dead && d.token === token
+              )
+                ? 'loose'
+                : 'win'
+              if (status === 'win') {
+                navigator.vibrate([100, 100, 100, 100, 100])
+              }
+              setState({
+                status: status,
+                gameover: true,
+                lastGames: data.payload
+              })
+            }
+          },
+          {
+            type: 'die',
+            do: () => {
+              const players = data.payload
+              if (players.find(d => d.dead && d.token === token)) {
+                navigator.vibrate(1000)
+                setState({ status: 'loose' })
+              }
             }
           }
+        ].find(d => d.type === data.type)
+        if (action) {
+          action.do()
         }
-      ].find(d => d.type === data.type)
-      if (action) {
-        action.do()
       }
     }
     // clean up
     return () => {
-      ws.close()
+      if (ws) {
+        ws.onmessage = undefined
+        ws.onerror = undefined
+      }
     }
   }, [])
-  const gameStatus = useGameStatus({ gameover: state.gameover })
-
-  if (gameStatus && !gameStatus.playing) {
-    return <Redirect to="/wait" />
-  }
+  const gameStatus = useGameStatus()
   const token = getCookie('token')
   const me =
     gameStatus &&
     gameStatus.players &&
     find(gameStatus.players, p => p.token === token)
-  console.log({ me, token, gameStatus })
   const { status, gameover, lastGames } = state
+  if (!status && gameStatus && !gameStatus.playing) {
+    return <Redirect to="/mor/wait" />
+  }
   return (
     <Center>
       <Grow in={!gameover && isNil(status)} unmountOnExit mountOnEnter>
@@ -128,6 +132,14 @@ const PlayGame = () => {
             <Typography variant="h6" gutterBottom>
               Fight !
             </Typography>
+            {me && (
+              <div style={{ margin: '40px 0' }}>
+                <Typography>You are</Typography>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <ColorBox color={me.color} />
+                </div>
+              </div>
+            )}
             <Typography>Avoid: simple click</Typography>
             <Typography>Block: double click</Typography>
           </ButtonBase>
@@ -152,7 +164,7 @@ const PlayGame = () => {
         </div>
       </Slide>
       <Slide direction="up" in={gameover} unmountOnExit mountOnEnter>
-        <div>
+        <div style={{ textAlign: 'center' }}>
           {lastGames && <JumpScores previousGames={lastGames} />}
           <Fab color="primary" onClick={restart}>
             <Replay />
