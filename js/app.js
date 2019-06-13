@@ -4,7 +4,7 @@ import { GameList } from './GameList'
 import { Jump } from './Jump'
 import { Tuner } from './Tuner'
 import Metronome from './Metronome'
-import { Router, Route, IndexRoute, Link, hashHistory } from 'react-router'
+import { Router, Route, IndexRoute, Link, hashHistory } from 'react-router-dom'
 import FastClick from 'fastclick'
 
 FastClick.attach(document.body)

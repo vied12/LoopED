@@ -3,6 +3,7 @@ import { WaterSurface } from './WaterSurface'
 import { JumpScores } from './JumpScores'
 import { isNil } from 'lodash'
 import { getCookie, startLEDGame } from './util'
+import PropTypes from 'prop-types'
 
 navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate
 
@@ -152,4 +153,4 @@ const style = {
     WebkitUserSelect: 'none',
     msUserSelect: 'none',
 }
-JumpGame.propTypes = { player: React.PropTypes.object }
+JumpGame.propTypes = { player: PropTypes.object }

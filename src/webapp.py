@@ -21,7 +21,7 @@ COLORS = [
 ]
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path="/static", static_folder="../frontend/build", template_folder="../frontend/build")
 app.config.from_envvar('SETTINGS')
 led = create_led(dev=app.config['DEBUG'], length=app.config['STRIP_LENGTH'])
 gamepad = WebGamePad()
@@ -35,21 +35,39 @@ app.state = {
     'all_games_ending': [],
 }
 
+@sockets.route('/controller')
+def controller_socket(ws):
+    token = request.cookies.get('token')
+    # key = request.json and request.json.get('key') or None
+    while not ws.closed:
+        key = ws.receive()
+        gamepad.click(token)
+    return 'ok'
 
 @sockets.route('/jump')
 def echo_socket(ws):
     token = request.cookies.get('token')
-    player = next((_ for _ in app.state['players'] if _['token'] == token))
-    app.state['ws'].append(ws)
-    player['connected'] = True
+    print('connecting', token)
+    try:
+        player = next((_ for _ in app.state['players'] if _['token'] == token))
+        player['connected'] = True
+        app.state['ws'].append(ws)
+        print('connected', player, app.state['players'])
+    except StopIteration:
+        print('user not found', token)
     while not ws.closed:
         ws.receive()
+    print('disconnect', token)
     app.state['ws'].remove(ws)
-    player['connected'] = False
-
+    try:
+        player = next((_ for _ in app.state['players'] if _['token'] == token))
+        player['connected'] = False
+    except StopIteration:
+        print('user not found', token)
+    print('players after disc', app.state['players'])
 
 @app.route('/')
-def gameList():
+def serve_react_app():
     return render_template('index.html')
 
 
@@ -65,6 +83,20 @@ def send_notifs(msg):
         except geventwebsocket.WebSocketError:
             app.state['ws'].remove(ws)
 
+
+@app.route('/jump-status')
+def jump_status():
+    print('p', app.state['players'])
+    data = {
+        'players': get_connected_players(),
+        'playing': app.state['playing'],
+    }
+    response = app.response_class(
+        response=json.dumps(data),
+        status=200,
+        mimetype='application/json'
+    )
+    return response
 
 @app.route('/jump-connect', methods=['POST'])
 def connectJump():
@@ -151,5 +183,5 @@ def run_animation(anim, **kwargs):
 
 if __name__ == '__main__':
     server = gevent.pywsgi.WSGIServer(('0.0.0.0', app.config['PORT']), app, handler_class=WebSocketHandler)
-    run_animation(Intro(led), untilComplete=True)
+    # run_animation(Intro(led), untilComplete=True)
     server.serve_forever()
