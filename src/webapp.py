@@ -68,6 +68,9 @@ def echo_socket(ws):
 
 
 @app.route('/')
+@app.route('/mor')
+@app.route('/mor/wait')
+@app.route('/mor/play')
 def serve_react_app():
     return render_template('index.html')
 
