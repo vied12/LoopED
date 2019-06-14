@@ -12,12 +12,9 @@ pyserial = "*"
 six = "*"
 spidev = "*"
 gunicorn = "*"
-aubio = "*"
-numpy = "*"
 BiblioPixel = "==2.1.2"
 Flask = "*"
 Flask-Sockets = "*"
-PyAudio = "*"
 
 [requires]
 python_version = "2.7"
