@@ -18,6 +18,9 @@ run:
 	SETTINGS=../settings.py DEV_MODE=$(DEV_MODE) HOST=$(HOST) \
 	pipenv run src/webapp.py
 
+prod:
+	sudo SETTINGS=../settings.py DEV_MODE=$(DEV_MODE) `pipenv --venv`/bin/gunicorn -b 0.0.0.0:80 -k flask_sockets.worker webapp:app --chdir src
+
 pull:
 	git pull
 

@@ -16,10 +16,10 @@ const useStyles = makeStyles(theme => ({
   },
   '@keyframes neon4': {
     from: {
-      textShadow: `0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff, 0 0 40px ${theme.palette.primary.main}, 0 0 70px ${theme.palette.primary.main}, 0 0 80px ${theme.palette.primary.main}, 0 0 100px ${theme.palette.primary.main}, 0 0 150px ${theme.palette.primary.main}`
+      textShadow: `0 0 0px #fff`
     },
     to: {
-      textShadow: `0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px ${theme.palette.primary.main}, 0 0 35px ${theme.palette.primary.main}, 0 0 40px ${theme.palette.primary.main}, 0 0 50px ${theme.palette.primary.main}, 0 0 75px ${theme.palette.primary.main}`
+      textShadow: `0 0 10px #fff, 0 0 20px ${theme.palette.primary.main}`
     }
   },
   rules: {
@@ -34,7 +34,7 @@ const useStyles = makeStyles(theme => ({
     padding: [[theme.spacing(6), theme.spacing(3)]],
     marginBottom: theme.spacing(2),
     '& h1': {
-      // animation: '$neon4 1.5s ease-in-out infinite alternate'
+      animation: '$neon4 2s ease-in infinite alternate'
     }
   }
 }))

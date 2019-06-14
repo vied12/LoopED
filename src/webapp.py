@@ -16,8 +16,12 @@ COLORS = [
     colors.Yellow,
     colors.Orange,
     colors.Purple,
-    colors.Magenta,
-    colors.Coral,
+    colors.Blue,
+    colors.Bisque,
+    colors.Crimson,
+    colors.PaleTurquoise,
+    colors.DarkGreen,
+    colors.Fuchsia,
 ]
 
 
@@ -27,13 +31,15 @@ led = create_led(dev=app.config['DEBUG'], length=app.config['STRIP_LENGTH'])
 gamepad = WebGamePad()
 sockets = Sockets(app)
 
-app.state = {
+INITIAL_STATE = {
     'current_animation': None,
     'players': [],
     'ws': [],
     'playing': False,
     'all_games_ending': [],
 }
+
+app.state = INITIAL_STATE.copy()
 
 @sockets.route('/controller')
 def controller_socket(ws):
@@ -154,12 +160,6 @@ def startJump():
     return jsonify(response)
 
 
-# @app.route('/tuner', methods=['POST'])
-# def tuner():
-#     run_animation(Tuner(led))
-#     return 'ok'
-
-
 @app.route('/controller', methods=['POST'])
 def controller():
     token = request.cookies.get('token')
@@ -167,13 +167,6 @@ def controller():
     gamepad.click(key or token)
     return 'ok'
 
-
-# @app.route('/metronome', methods=['POST'])
-# def metronome():
-#     bpm = request.json and int(request.json.get('bpm')) or None
-#     color = request.json and request.json.get('color') or None
-#     run_animation(Metronome(led, gamepad=gamepad, bpm=bpm, color=color), fps=30)
-#     return 'ok'
 
 
 def run_animation(anim, **kwargs):
@@ -184,7 +177,9 @@ def run_animation(anim, **kwargs):
     app.state['current_animation'].run(threaded=True, **kwargs)
 
 
+run_animation(Intro(led), untilComplete=True)
+
+
 if __name__ == '__main__':
     server = gevent.pywsgi.WSGIServer(('0.0.0.0', app.config['PORT']), app, handler_class=WebSocketHandler)
-    # run_animation(Intro(led), untilComplete=True)
     server.serve_forever()

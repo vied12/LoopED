@@ -34,10 +34,7 @@ export const useGameConnect = () => {
 
 const useGameStatus = () => {
   const [status, setStatus] = React.useState(null)
-  console.log('useGameStatus')
   React.useEffect(() => {
-    // if (!status) {
-    console.log('useGameStatus GET')
     fetch('/jump-status', {
       credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
@@ -47,7 +44,6 @@ const useGameStatus = () => {
       .then(data => {
         setStatus(data)
       })
-    // }
   }, [])
 
   return status

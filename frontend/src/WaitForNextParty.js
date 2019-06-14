@@ -1,19 +1,16 @@
 import React from 'react'
 import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/styles'
-import { useGameConnect } from './useGameStatus'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import Button from '@material-ui/core/Button'
 import { startLEDGame } from './util'
 import { getCookie } from './util'
 import find from 'lodash/find'
 import ColorBox from './ColorBox'
-import { useWebsocket } from './useWebsocket'
 
 const useStyles = makeStyles(theme => ({
   root: {
     textAlign: 'center',
-    // margin: theme.spacing(6),
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -23,13 +20,6 @@ const useStyles = makeStyles(theme => ({
   body: {
     margin: 60
   },
-  // color: {
-  //   width: 25,
-  //   height: 25,
-  //   margin: '0 auto',
-  //   // display: 'inline-block',
-  //   // border: '2px solid white',
-  // },
   displayColor: {
     margin: '20px 0'
   }
@@ -37,9 +27,7 @@ const useStyles = makeStyles(theme => ({
 
 const WaitForNextParty = ({ history, initialGameProps, ws }) => {
   const classes = useStyles()
-  // // const gameProps = useGameConnect()
   const [players, setPlayers] = React.useState(initialGameProps.players)
-  // const [ws, gameProps] = useWebsocket()
   React.useEffect(() => {
     if (ws) {
       ws.onmessage = event => {

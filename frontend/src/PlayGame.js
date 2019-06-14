@@ -49,9 +49,6 @@ const PlayGame = ({ ws }) => {
 
   React.useEffect(() => {
     if (ws) {
-      ws.onerror = event => {
-        console.error('ws err', event)
-      }
       ws.onmessage = event => {
         const data = JSON.parse(event.data)
         const token = getCookie('token')
@@ -105,10 +102,9 @@ const PlayGame = ({ ws }) => {
     return () => {
       if (ws) {
         ws.onmessage = undefined
-        ws.onerror = undefined
       }
     }
-  }, [])
+  }, [ws])
   const gameStatus = useGameStatus()
   const token = getCookie('token')
   const me =
@@ -128,7 +124,7 @@ const PlayGame = ({ ws }) => {
             onClick={handleJump}
           >
             <Typography variant="h6" gutterBottom>
-              Fight !
+              Fight!
             </Typography>
             {me && (
               <div style={{ margin: '40px 0' }}>
