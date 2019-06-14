@@ -35,7 +35,6 @@ const Center = props => {
 const PlayGame = ({ ws }) => {
   const [state, setState] = React.useState({})
   const handleJump = useController()
-  // const ws = useWebsocket()
 
   const restart = e => {
     e.preventDefault()
@@ -49,7 +48,6 @@ const PlayGame = ({ ws }) => {
   }
 
   React.useEffect(() => {
-    // const ws = new WebSocket(`ws://localhost:8000/jump`)
     if (ws) {
       ws.onerror = event => {
         console.error('ws err', event)

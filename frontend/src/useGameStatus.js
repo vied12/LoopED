@@ -1,18 +1,12 @@
 import React from 'react'
 import { __RouterContext } from 'react-router'
 import { getCookie } from './util'
-// import { useWebsocket } from './useWebsocket'
 
 export const useGameConnect = () => {
   const [user, setUser] = React.useState(null)
   const [isFirst, setFirst] = React.useState(false)
   const { history } = React.useContext(__RouterContext)
-  // const ws = useWebsocket()
-  console.log('useGameConnect')
   React.useEffect(() => {
-    console.log('useGameConnect POST')
-    // let ws
-    // if (!user) {
     fetch('/jump-connect', {
       credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
@@ -20,7 +14,6 @@ export const useGameConnect = () => {
     })
       .then(d => d.json())
       .then(data => {
-        // ws = new WebSocket(`ws://localhost:8000/jump`)
         setUser({
           ...data,
           ready: true
@@ -31,13 +24,6 @@ export const useGameConnect = () => {
           setFirst(true)
         }
       })
-    // }
-    // return () => {
-    //   if (ws) {
-    //     ws.onmessage = undefined
-    //     // ws.close()
-    //   }
-    // }
   }, [history])
 
   return {

@@ -5,7 +5,7 @@ let ws
 export const useWebsocket = () => {
   const gameProps = useGameConnect()
   if (gameProps.ready && !ws) {
-    ws = new WebSocket(`ws://localhost:8000/jump`)
+    ws = new WebSocket(`ws://${process.env.REACT_APP_HOST}/jump`)
     ws.onclose = () => console.log('CLOSE')
     ws.onopen = () => console.log('OPEN')
     ws.onerror = e => console.log('ERROR', e)

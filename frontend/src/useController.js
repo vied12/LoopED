@@ -1,5 +1,7 @@
 export const useController = () => {
-  const controllerSocket = new WebSocket(`ws://localhost:8000/controller`)
+  const controllerSocket = new WebSocket(
+    `ws://${process.env.REACT_APP_HOST}/controller`
+  )
   return () => {
     controllerSocket.send('jump!')
   }
