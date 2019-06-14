@@ -19,7 +19,7 @@ run:
 	pipenv run src/webapp.py
 
 prod:
-	sudo SETTINGS=../settings.py DEV_MODE=$(DEV_MODE) `pipenv --venv`/bin/gunicorn -b 0.0.0.0:80 -k flask_sockets.worker webapp:app --chdir src
+	sudo SETTINGS=../settings.py DEV_MODE=$(DEV_MODE) `pipenv --venv`/bin/gunicorn -w 1 -b 0.0.0.0:80 -k flask_sockets.worker webapp:app --chdir src
 
 build:
 	REACT_APP_HOST=master.ring npm run build
