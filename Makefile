@@ -21,11 +21,11 @@ run:
 prod:
 	sudo SETTINGS=../settings.py DEV_MODE=$(DEV_MODE) `pipenv --venv`/bin/gunicorn -b 0.0.0.0:80 -k flask_sockets.worker webapp:app --chdir src
 
+build:
+	REACT_APP_HOST=master.ring npm run build
+
 pull:
 	git pull
-
-build:
-	HOST=$(HOST) $(NODE) node_modules/webpack/bin/webpack.js
 
 install:
 	sudo apt-get install portaudio19-dev
