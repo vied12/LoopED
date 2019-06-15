@@ -159,7 +159,9 @@ const PlayGame = ({ ws }) => {
       </Slide>
       <Slide direction="up" in={gameover} unmountOnExit mountOnEnter>
         <div style={{ textAlign: 'center' }}>
-          {lastGames && <JumpScores previousGames={lastGames} />}
+          {lastGames && (
+            <JumpScores previousGames={lastGames} myToken={token} />
+          )}
           <Fab color="primary" onClick={restart}>
             <Replay />
           </Fab>
