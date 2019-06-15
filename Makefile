@@ -20,7 +20,7 @@ run:
 
 prod:
 	# sudo SETTINGS=../settings.py DEV_MODE=$(DEV_MODE) `pipenv --venv`/bin/python `pipenv --venv`/bin/gunicorn -w 1 -b 0.0.0.0:80 -k flask_sockets.worker webapp:app --chdir src -p ../app.pid
-	sudo SETTINGS=../settings.py PORT=80 `pipenv --venv`/bin/python src/webapp.py
+	sudo SETTINGS=../settings.py PORT=80 /home/pi/.local/share/virtualenvs/LoopED-x0t2Dq2e/bin/python src/webapp.py
 
 restart:
 	sudo kill -HUP `cat app.pid`
