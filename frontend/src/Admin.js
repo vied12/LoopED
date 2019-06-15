@@ -13,6 +13,13 @@ const useStyles = makeStyles(theme => ({
 
 const Admin = () => {
   const classes = useStyles()
+
+  const restartServer = () => {
+    fetch('/restart-server', {
+      credentials: 'same-origin',
+      method: 'POST'
+    })
+  }
   return (
     <div className={classes.root}>
       <Typography variant="h1" gutterBottom style={{ marginBottom: 100 }}>
@@ -20,8 +27,8 @@ const Admin = () => {
       </Typography>
 
       <div className={classes.body}>
-        <Button variant="contained" color="primary">
-          Reset
+        <Button variant="contained" color="primary" onClick={restartServer}>
+          Restart server
         </Button>
       </div>
     </div>

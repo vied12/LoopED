@@ -4,3 +4,4 @@ static/bundle.js
 *.pyc
 .env
 .vscode
+app.pid

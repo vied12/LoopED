@@ -77,6 +77,7 @@ def echo_socket(ws):
 @app.route('/mor')
 @app.route('/mor/wait')
 @app.route('/mor/play')
+@app.route('/aaa')
 def serve_react_app():
     return render_template('index.html')
 
@@ -176,6 +177,12 @@ def run_animation(anim, **kwargs):
     app.state['current_animation'] = anim
     app.state['current_animation'].run(threaded=True, **kwargs)
 
+import subprocess
+
+@app.route('/restart-server', methods=['POST'])
+def restart_server():
+    result = subprocess.call(["make", "restart"], cwd="../")
+    return 'ok'
 
 run_animation(Intro(led), untilComplete=True)
 
